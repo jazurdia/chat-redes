@@ -5,7 +5,7 @@ function ChatWindow() {
             <div>
                 aqui iran los mensajes.
             </div>
-            <div>
+            <div className=''>
                 <input type="text" placeholder="Escribe un mensaje" />
                 <button>Enviar</button>
             </div>
