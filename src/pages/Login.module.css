@@ -1,0 +1,13 @@
+.maingroup{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 60px 40px;
+    width: fit-content;
+}
+
+.formgroup{
+    margin-top: 80px;
+
+}
