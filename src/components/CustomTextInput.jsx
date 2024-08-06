@@ -1,11 +1,15 @@
 import PropTypes from "prop-types";
-import styles from "./CustomTextInput.module.css"; // Importa los estilos como módulos
 
 function CustomTextInput({ label, name, placeholder, value, onChange }) {
     return (
-        <div className={styles.formGroup}>
-            {label && <label htmlFor={name} className={styles.label}>{label}</label>}
+        <div className="flex flex-col p-3 pl-0 pr-0 space-y-1 w-full">
+            {label && (
+                <label className="text-left" htmlFor={name}>
+                    {label}
+                </label>
+            )}
             <input
+                className="border border-gray-300 rounded-md p-2"
                 type={name === "password" ? "password" : "text"}
                 id={name}
                 name={name}
