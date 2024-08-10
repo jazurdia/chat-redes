@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { connectToXMPP } from './connectToXMPP';
 
-const AuthContext = createContext();
+const AuthContext = createContext(undefined);
 
 // eslint-disable-next-line react/prop-types
 export const AuthProvider = ({ children }) => {
