@@ -29,9 +29,4 @@ CustomTextInput.propTypes = {
     onChange: PropTypes.func.isRequired, // Añadir el tipo para onChange
 };
 
-CustomTextInput.defaultProps = {
-    label: '',
-    placeholder: '',
-};
-
 export default CustomTextInput;

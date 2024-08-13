@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useEffect, useContext } from 'react';
 import Login from './pages/Login';
 import Home from './pages/Home';
-import AuthContext from './auxiliaryFunctions/AuthContext.jsx';
+import AuthContext from './auxiliaryFunctions/AuthContext';
 
 function App() {
     const navigate = useNavigate();
