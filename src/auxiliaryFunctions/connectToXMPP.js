@@ -1,8 +1,9 @@
-import {client as xmppClient} from '@xmpp/client';
+// eslint-disable-next-line no-unused-vars
+import { client as xmppClient, xml } from '@xmpp/client';
 
 export const connectToXMPP = async (jid, password) => {
     const client = xmppClient({
-        service: 'ws://alumchat.lol:7070/ws/',
+        service: 'ws://alumchat.lol:7070/ws/', // HTTP links should be avoided in production
         domain: 'alumchat.lol',
         username: jid,
         password: password,
@@ -12,17 +13,8 @@ export const connectToXMPP = async (jid, password) => {
         console.error('XMPP Error:', err);
     });
 
-    client.on('online', (address) => {
-        console.log('Connected as', address.toString());
-    });
-
-    client.on('stanza', (stanza) => {
-        console.log('New stanza:', stanza.toString());
-    });
-
     try {
         await client.start();
-        console.log('Connection started successfully');
         return client;
     } catch (error) {
         console.error('Failed to connect:', error);
