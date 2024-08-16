@@ -1,23 +1,35 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
 import ChatWindow from "../components/ChatWindow.jsx";
-import { getMessages } from '../auxiliaryFunctions/connectToXMPP.js';
+import { getMessages, listenForNewMessages } from '../auxiliaryFunctions/connectToXMPP.js';
 
 function Home() {
     const { user, logout } = useContext(AuthContext);
+    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const messages = await getMessages(user.client);
-                console.log('Messages (home)\n:', messages);
+                const fetchedMessages = await getMessages(user.client);
+                console.log('Messages (home):', fetchedMessages);
+                setMessages(fetchedMessages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
         };
 
+        const handleNewMessage = (message) => {
+            setMessages((prevMessages) => [...prevMessages, message]);
+        };
+
         if (user && user.client) {
             fetchMessages();
+            const removeListener = listenForNewMessages(user.client, handleNewMessage);
+
+            // Cleanup listener on unmount
+            return () => {
+                removeListener();
+            };
         }
     }, [user]);
 
@@ -36,9 +48,11 @@ function Home() {
             <div className='flex flex-row w-screen h-full'>
                 <div className='w-1/3 bg-slate-300'>
                     <h1>Users</h1>
+                    <p>cantidad de mensajes: {messages.length}</p>
                 </div>
                 <div className='w-2/3 bg-slate-400'>
                     <ChatWindow messages={[]}/>
+
                 </div>
             </div>
         </div>

@@ -26,46 +26,13 @@ export const connectToXMPP = async (jid, password) => {
     }
 };
 
-/*
-export const getMessages = async (client) => {
-    return new Promise((resolve, reject) => {
-        const stanzas = [];
-
-        client.on('stanza', (stanza) => {
-            //console.log('stanza:\n', stanza.toString()); // Log the entire stanza
-            stanzas.push(stanza.toString());
-        });
-
-        // Send a MAM query to retrieve all archived messages
-        const mamRequestStanza = xml(
-            'iq',
-            { type: 'set', id: 'get-messages' },
-            xml('query', { xmlns: 'urn:xmpp:mam:2' },
-                xml('x', { xmlns: 'jabber:x:data', type: 'submit' },
-                    xml('field', { var: 'FORM_TYPE', type: 'hidden' },
-                        xml('value', {}, 'urn:xmpp:mam:2')
-                    )
-                )
-            )
-        );
-
-        console.log('Sending MAM request stanza:\n', mamRequestStanza.toString()); // Log the MAM request stanza
-        client.send(mamRequestStanza);
-
-        // Resolve after a delay to collect stanzas
-        setTimeout(() => resolve(stanzas), 5000);
-    });
-};
-
- */
 
 export const getMessages = async (client) => {
     return new Promise((resolve) => {
         const stanzas = [];
+        const processedMessageIds = new Set();
 
-        client.on('stanza', (stanza) => {
-           //console.log('stanza received:\n', stanza.toString()); // Log the entire stanza
-
+        const handleStanza = (stanza) => {
             if (stanza.is('message') && stanza.getChild('result', 'urn:xmpp:mam:2')) {
                 const result = stanza.getChild('result', 'urn:xmpp:mam:2');
                 const forwarded = result.getChild('forwarded', 'urn:xmpp:forward:0');
@@ -74,15 +41,21 @@ export const getMessages = async (client) => {
                     const body = message.getChildText('body');
                     const from = message.attrs.from;
                     const timestamp = forwarded.getChild('delay', 'urn:xmpp:delay').attrs.stamp;
+                    const messageId = message.attrs.id;
 
-                    stanzas.push({
-                        from,
-                        body,
-                        timestamp,
-                    });
+                    if (!processedMessageIds.has(messageId)) {
+                        processedMessageIds.add(messageId);
+                        stanzas.push({
+                            from,
+                            body,
+                            timestamp,
+                        });
+                    }
                 }
             }
-        });
+        };
+
+        client.on('stanza', handleStanza);
 
         // MAM query to retrieve all archived messages
         const mamRequestStanza = xml(
@@ -102,7 +75,39 @@ export const getMessages = async (client) => {
         client.send(mamRequestStanza);
 
         setTimeout(() => {
+            client.removeListener('stanza', handleStanza); // Remove the event listener
             resolve(stanzas);
         }, 5000);
     });
+};
+
+export const listenForNewMessages = (client, callback) => {
+    const handleStanza = (stanza) => {
+        if (stanza.is('message') && stanza.attrs.type === 'chat') {
+            const body = stanza.getChildText('body');
+            const from = stanza.attrs.from;
+            const timestamp = new Date().toISOString(); // Use current timestamp for new messages
+
+            if (body) {
+                callback({
+                    from,
+                    body,
+                    timestamp,
+                });
+            }
+        }
+    };
+
+    client.on('stanza', handleStanza);
+
+    // Poll for new messages every 3 seconds
+    const intervalId = setInterval(() => {
+        client.send(xml('presence')); // Send a presence stanza to keep the connection alive
+    }, 3000);
+
+    // Return a function to remove the listener and clear the interval when needed
+    return () => {
+        client.removeListener('stanza', handleStanza);
+        clearInterval(intervalId);
+    };
 };
