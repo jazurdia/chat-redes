@@ -1,9 +1,25 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
 import ChatWindow from "../components/ChatWindow.jsx";
+import { getMessages } from '../auxiliaryFunctions/connectToXMPP.js';
 
 function Home() {
-    const { logout } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const messages = await getMessages(user.client);
+                console.log('Messages (home)\n:', messages);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        };
+
+        if (user && user.client) {
+            fetchMessages();
+        }
+    }, [user]);
 
     const handleLogout = () => {
         logout();
