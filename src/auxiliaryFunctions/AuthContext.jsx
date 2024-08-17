@@ -35,14 +35,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('email');
-        localStorage.removeItem('password');
-
-        // regresa a la página de login
-        window.location.href = '/';
-
-    };
+    if (user && user.client) {
+        user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
+    }
+    setUser(null);
+    localStorage.removeItem('email');
+    localStorage.removeItem('password');
+    window.location.href = '/';
+};
 
     const isAuthenticated = () => {
         return !!user;
