@@ -40,6 +40,7 @@ export const getMessages = async (client) => {
                     const message = forwarded.getChild('message', 'jabber:client');
                     const body = message.getChildText('body');
                     const from = message.attrs.from;
+                    const to = message.attrs.to; // Extraer el campo 'to'
                     const timestamp = forwarded.getChild('delay', 'urn:xmpp:delay').attrs.stamp;
                     const messageId = message.attrs.id;
 
@@ -47,6 +48,7 @@ export const getMessages = async (client) => {
                         processedMessageIds.add(messageId);
                         stanzas.push({
                             from,
+                            to, // Incluir el campo 'to'
                             body,
                             timestamp,
                         });
@@ -86,15 +88,20 @@ export const listenForNewMessages = (client, callback) => {
         if (stanza.is('message') && stanza.attrs.type === 'chat') {
             const body = stanza.getChildText('body');
             const from = stanza.attrs.from;
+            const to = stanza.attrs.to;
             const timestamp = new Date().toISOString(); // Use current timestamp for new messages
 
             if (body) {
                 callback({
                     from,
+                    to,
                     body,
                     timestamp,
                 });
             }
+
+            console.log('Received message:', body, '\nfrom:', from, '\nto:', to);
+
         }
     };
 

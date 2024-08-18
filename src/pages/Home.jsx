@@ -26,21 +26,10 @@ function Home() {
         const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, message];
+                console.log('(HOME) new message received\n:', message);
                 classifyMessages(updatedMessages);
                 return updatedMessages;
             });
-        };
-
-        const classifyMessages = (messages) => {
-            const convs = messages.reduce((acc, message) => {
-                const { from } = message;
-                if (!acc[from]) {
-                    acc[from] = [];
-                }
-                acc[from].push(message);
-                return acc;
-            }, {});
-            setConversations(convs);
         };
 
         if (user && user.client) {
@@ -54,6 +43,48 @@ function Home() {
             }
         };
     }, [user]);
+
+    const classifyMessages = (messages) => {
+        const groupMessages = [];
+        const contactMessages = [];
+
+        messages.forEach((message) => {
+            if ((message.from && message.from.includes("conference")) || (message.to && message.to.includes("conference"))) {
+                groupMessages.push(message);
+            } else {
+                contactMessages.push(message);
+            }
+        });
+
+        contactMessages.forEach((message) => {
+            if (message.from) {
+                message.from = message.from.split('/')[0];
+            }
+            if (message.to) {
+                message.to = message.to.split('/')[0];
+            }
+        });
+
+        const updatedConversations = { ...conversations }; // Clonar el estado actual
+
+        contactMessages.forEach((message) => {
+            const participants = [message.from, message.to].sort().join('-');
+            if (!updatedConversations[participants]) {
+                updatedConversations[participants] = [];
+            }
+            updatedConversations[participants].push(message);
+        });
+
+        groupMessages.forEach((message) => {
+            const groupName = message.to.split('@')[0];
+            if (!updatedConversations[groupName]) {
+                updatedConversations[groupName] = [];
+            }
+            updatedConversations[groupName].push(message);
+        });
+
+        setConversations(updatedConversations);
+    };
 
     const handleLogout = () => {
         logout();
