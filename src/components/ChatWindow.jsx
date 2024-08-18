@@ -4,11 +4,12 @@ import PropTypes from 'prop-types';
 import MessageItem from "./MessageItem.jsx";
 import { useContext } from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
-import './ChatWindow.css'; // Importar el archivo CSS
 
 function ChatWindow({ messages }) {
     const messagesEndRef = useRef(null);
+    // eslint-disable-next-line no-unused-vars
     const { user } = useContext(AuthContext);
+
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -20,9 +21,8 @@ function ChatWindow({ messages }) {
                 {messages.map((message, index) => (
                     <MessageItem
                         key={index}
-                        name={message.from}
-                        message={message.body}
-                        isSent={message.from === user.email}
+                        body={message.body}
+                        from={message.from}
                         timestamp={message.timestamp}
                     />
                 ))}

@@ -18,6 +18,7 @@ function Home() {
                 const fetchedMessages = await getMessages(user.client);
                 setMessages(fetchedMessages);
                 classifyMessages(fetchedMessages);
+                console.log("classified messages", fetchedMessages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -92,7 +93,10 @@ function Home() {
 
     const handleSelectConversation = (contactId) => {
         setSelectedConversation(contactId);
+        console.log("Selected conversations: ", contactId);
     };
+
+    console.log("conversation", conversations);
 
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
