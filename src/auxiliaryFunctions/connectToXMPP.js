@@ -26,7 +26,6 @@ export const connectToXMPP = async (jid, password) => {
     }
 };
 
-
 export const getMessages = async (client) => {
     return new Promise((resolve) => {
         const stanzas = [];
@@ -117,4 +116,28 @@ export const listenForNewMessages = (client, callback) => {
         client.removeListener('stanza', handleStanza);
         clearInterval(intervalId);
     };
+};
+
+export const sendMessage = async (client, to, body) => {
+    const from = client.jid.toString();
+
+    console.log("En send message\n")
+    console.log("from: ", from)
+    console.log("to: ", to)
+    console.log("body: ", body)
+
+
+    const messageStanza = xml(
+        'message',
+        { type: 'chat', to, from },
+        xml('body', {}, body)
+    );
+
+    try {
+        await client.send(messageStanza);
+        console.log('Message sent:', body, '\nto:', to);
+    } catch (error) {
+        console.error('Failed to send message:', error);
+        throw error;
+    }
 };

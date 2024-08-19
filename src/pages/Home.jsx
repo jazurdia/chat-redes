@@ -9,6 +9,8 @@ function Home() {
     const [messages, setMessages] = useState([]);
     const [conversations, setConversations] = useState({});
     const [selectedConversation, setSelectedConversation] = useState(null);
+    const [destinatary, setDestinatary] = useState("");
+    const [isGroup, setIsGroup] = useState(false);
 
     useEffect(() => {
         let removeListener;
@@ -17,6 +19,7 @@ function Home() {
             try {
                 const fetchedMessages = await getMessages(user.client);
                 setMessages(fetchedMessages);
+                console.log("fetched messages", fetchedMessages);
                 classifyMessages(fetchedMessages);
                 console.log("classified messages", fetchedMessages);
             } catch (error) {
@@ -27,7 +30,6 @@ function Home() {
         const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, message];
-                console.log('(HOME) new message received\n:', message);
                 classifyMessages(updatedMessages);
                 return updatedMessages;
             });
@@ -44,6 +46,8 @@ function Home() {
             }
         };
     }, [user]);
+
+    //console.log("Mesajes recibidos raw: ", messages);
 
     const classifyMessages = (messages) => {
         const groupMessages = [];
@@ -93,21 +97,38 @@ function Home() {
 
     const handleSelectConversation = (contactId) => {
         setSelectedConversation(contactId);
+        setIsGroup(contactId.includes('conference'));
         console.log("Selected conversations: ", contactId);
+        console.log("Is group: ", isGroup);
+
+        // obtener destinatario
+        const logged_user = user.client.jid.local + "@alumchat.lol";
+
+        if (!isGroup) {
+            if (contactId.includes(logged_user)) {
+                const contact = contactId.replace(logged_user, '').replace('-', '');
+                setDestinatary(contact);
+                //console.log("Destinatario: ", destinatary);
+            } else {
+                console.log("Algo salio mal al obtener el destinatario");
+            }
+        }
+
+
     };
 
-    console.log("conversation", conversations);
+    //console.log("conversation", conversations);
 
     return (
-        <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
-            <div className="w-full text-white bg-slate-700 p-4 space flex justify-around h-[8%]">
+<div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
+    <div className="w-full text-white bg-slate-700 p-4 space flex justify-around h-[8%]">
                 <h1 className='text-3xl'>Chat de Alejandro</h1>
                 <button onClick={handleLogout}
                         className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     Cerrar sesión
                 </button>
             </div>
-            <div className='flex flex-row h-full h-[92%]'>
+            <div className='flex flex-row h-full h-[92%] overflow-hidden overflow-y-scroll'>
                 <div className='w-1/3 bg-slate-300'>
                     <p>cantidad de mensajes: {messages.length}</p>
                     {Object.keys(conversations).map((contactId) => (
@@ -119,8 +140,11 @@ function Home() {
                         />
                     ))}
                 </div>
-                <div className='w-2/3 bg-slate-400'>
-                    <ChatWindow messages={selectedConversation ? conversations[selectedConversation] : []} />
+                <div className='w-2/3 bg-slate-400 overflow-hidden overflow-y-scroll scrollbar-hide'>
+                    <ChatWindow messages={selectedConversation ? conversations[selectedConversation] : []}
+                                destinatary={destinatary}
+                                setMessages={setMessages}
+                    />
                 </div>
             </div>
         </div>
