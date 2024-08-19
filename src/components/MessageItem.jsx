@@ -9,8 +9,8 @@ function MessageItem({body, from, timestamp}) {
     const isSent = from.includes(loggedUser);
 
     return (
-        <div className={`flex ${isSent ? 'justify-end' : 'justify-start'} mb-2 w-2/3`}>
-            <div className={`rounded-md p-2 ${isSent ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black w-full'}`}>
+        <div className={`flex ${isSent ? 'justify-end' : 'justify-start'} mb-2`}>
+            <div className={`rounded-md p-2 ${isSent ? 'bg-blue-500 text-white w-2/3' : 'bg-gray-300 text-black w-2/3'}`}>
                 <p className='text-xs mb-0.5'>{from}</p>
                 <p className='text-md mb-0.5'>{body}</p>
                 <p className='text-xs text-right'>{timestamp}</p>
