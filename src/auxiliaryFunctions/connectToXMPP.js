@@ -235,3 +235,40 @@ export const deleteAccount = async (client) => {
         throw error;
     }
 };
+
+
+export const getContacts = async (client) => {
+    try {
+        // Enviar el IQ request para obtener la lista de contactos
+        const rosterResponse = await client.iqCaller.request(
+            xml(
+                'iq',
+                { type: 'get' },
+                xml(
+                    'query',
+                    { xmlns: 'jabber:iq:roster' }
+                )
+            )
+        );
+
+        console.log('Roster response:', rosterResponse);
+
+        if (rosterResponse.attrs.type === 'result') {
+            const contacts = [];
+            const items = rosterResponse.getChild('query', 'jabber:iq:roster').getChildren('item');
+            items.forEach(item => {
+                contacts.push({
+                    jid: item.attrs.jid,
+                    name: item.attrs.name || '',
+                    subscription: item.attrs.subscription || 'none'
+                });
+            });
+            return contacts;
+        } else {
+            throw new Error('Failed to retrieve contacts');
+        }
+    } catch (error) {
+        console.error('Failed to get contacts:', error);
+        throw error;
+    }
+};

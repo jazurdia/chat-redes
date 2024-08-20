@@ -1,7 +1,7 @@
 import {useContext, useEffect, useState} from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
 import ChatWindow from "../components/ChatWindow.jsx";
-import {getMessages, listenForNewMessages, deleteAccount} from '../auxiliaryFunctions/connectToXMPP.js';
+import {getMessages, listenForNewMessages, deleteAccount, getContacts} from '../auxiliaryFunctions/connectToXMPP.js';
 import ContactDisplay from "../components/ContactDisplay.jsx";
 
 function Home() {
@@ -11,6 +11,7 @@ function Home() {
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [destinatary, setDestinatary] = useState("");
     const [isGroup, setIsGroup] = useState(false);
+    const [contacts, setContacts] = useState([]);
 
     useEffect(() => {
         let removeListener;
@@ -27,6 +28,16 @@ function Home() {
             }
         };
 
+        const fetchContacts = async () => {
+            try {
+                const contacts = await getContacts(user.client);
+                console.log("Contactos recibidos: \n", contacts);
+                setContacts(contacts);
+            } catch (error) {
+                console.error('Error fetching contacts:', error);
+            }
+        }
+
         const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, message];
@@ -37,6 +48,7 @@ function Home() {
 
         if (user && user.client) {
             fetchMessages();
+            fetchContacts();
             removeListener = listenForNewMessages(user.client, handleNewMessage);
         }
 
@@ -45,6 +57,8 @@ function Home() {
                 removeListener();
             }
         };
+
+
     }, [user]);
 
     //console.log("Mesajes recibidos raw: ", messages);
@@ -116,6 +130,7 @@ function Home() {
 
 
     };
+
 
     //console.log("conversation", conversations);
 
