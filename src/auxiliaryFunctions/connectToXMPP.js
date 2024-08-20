@@ -1,4 +1,4 @@
-import { client as xmppClient, xml } from '@xmpp/client';
+import {client as xmppClient, xml} from '@xmpp/client';
 
 export const connectToXMPP = async (jid, password) => {
     const client = xmppClient({
@@ -61,17 +61,17 @@ export const getMessages = async (client) => {
         // MAM query to retrieve all archived messages
         const mamRequestStanza = xml(
             'iq',
-            { type: 'set', id: 'get-messages' },
-            xml('query', { xmlns: 'urn:xmpp:mam:2' },
-                xml('x', { xmlns: 'jabber:x:data', type: 'submit' },
-                    xml('field', { var: 'FORM_TYPE', type: 'hidden' },
+            {type: 'set', id: 'get-messages'},
+            xml('query', {xmlns: 'urn:xmpp:mam:2'},
+                xml('x', {xmlns: 'jabber:x:data', type: 'submit'},
+                    xml('field', {var: 'FORM_TYPE', type: 'hidden'},
                         xml('value', {}, 'urn:xmpp:mam:2')
                     )
                 )
             )
         );
 
-        console.log('Sending MAM request stanza:\n', mamRequestStanza.toString());
+        //console.log('Sending MAM request stanza:\n', mamRequestStanza.toString());
 
         client.send(mamRequestStanza);
 
@@ -129,7 +129,7 @@ export const sendMessage = async (client, to, body) => {
 
     const messageStanza = xml(
         'message',
-        { type: 'chat', to, from },
+        {type: 'chat', to, from},
         xml('body', {}, body)
     );
 
@@ -139,5 +139,71 @@ export const sendMessage = async (client, to, body) => {
     } catch (error) {
         console.error('Failed to send message:', error);
         throw error;
+    }
+};
+
+export const registerUser = async (newUsername, newPassword) => {
+    console.log("Registering new user...\nNew username: " + newUsername);
+
+    // Crear cliente XMPP con las credenciales del usuario existente
+    const client = xmppClient({
+        service: 'ws://alumchat.lol:7070/ws/',
+        domain: 'alumchat.lol',
+        username: 'azu21242',
+        password: 'azu21242',
+    });
+
+    client.on('error', (err) => {
+        console.error('XMPP Error:', err);
+    });
+
+    try {
+        // Iniciar el cliente XMPP
+        await client.start();
+
+        // Enviar el IQ request para registrar el nuevo usuario
+        const registrationResponse = await client.iqCaller.request(
+            xml(
+                "iq",
+                { type: "set" },
+                xml(
+                    "query",
+                    { xmlns: "jabber:iq:register" },
+                    xml("username", {}, newUsername),
+                    xml("password", {}, newPassword)
+                )
+            )
+        );
+
+        console.log('Registration response:', registrationResponse);
+
+        if (registrationResponse.attrs.type === 'result') {
+            console.log('User registered successfully');
+        } else {
+            throw new Error('Registration failed');
+        }
+
+        // Cerrar sesión del nuevo usuario
+        const newUserClient = xmppClient({
+            service: 'ws://alumchat.lol:7070/ws/',
+            domain: 'alumchat.lol',
+            username: newUsername,
+            password: newPassword,
+        });
+
+        newUserClient.on('error', (err) => {
+            console.error('XMPP Error:', err);
+        });
+
+        await newUserClient.start();
+        await newUserClient.stop();
+        console.log('Logged out the new user');
+    } catch (error) {
+        console.error('Failed to register:', error);
+        throw error;
+    } finally {
+        // Cerrar sesión del usuario existente
+        await client.stop();
+        console.log('Logged out the existing user');
     }
 };

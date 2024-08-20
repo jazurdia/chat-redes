@@ -1,10 +1,10 @@
-import { createContext, useState, useEffect } from 'react';
-import { connectToXMPP } from './connectToXMPP';
+import {createContext, useState, useEffect} from 'react';
+import {connectToXMPP} from './connectToXMPP';
 
 const AuthContext = createContext(undefined);
 
 // eslint-disable-next-line react/prop-types
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
         if (email && password) {
             connectToXMPP(email, password)
                 .then(client => {
-                    setUser({ email, client });
+                    setUser({email, client});
                 })
                 .catch(error => {
                     console.error('Error al conectar automáticamente:', error);
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const client = await connectToXMPP(email, password);
-            setUser({ email, client });
+            setUser({email, client});
             localStorage.setItem('email', email);
             localStorage.setItem('password', password);
         } catch (error) {
@@ -35,21 +35,30 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-    if (user && user.client) {
-        user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
+        if (user && user.client) {
+            user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
+        }
+        setUser(null);
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');
+        window.location.href = '/';
+    };
+
+    const clearUserContext = () => {
+        if (user && user.client) {
+            user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
+        }
+        setUser(null);
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');
     }
-    setUser(null);
-    localStorage.removeItem('email');
-    localStorage.removeItem('password');
-    window.location.href = '/';
-};
 
     const isAuthenticated = () => {
         return !!user;
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
+        <AuthContext.Provider value={{user, login, logout, clearUserContext, isAuthenticated}}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,36 +1,43 @@
-import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useContext, useEffect, useState} from 'react';
 import CustomTextInput from '../components/CustomTextInput';
-import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
+import { registerUser } from '../auxiliaryFunctions/connectToXMPP';
+import {useNavigate} from "react-router-dom";
+import AuthContext from "../auxiliaryFunctions/AuthContext.jsx";
 
-function Login() {
-    const [email, setEmail] = useState('');
+
+function SignUp() {
+    const [newUser, setNewUser] = useState('');
     const [password, setPassword] = useState('');
+    const {clearUserContext} = useContext(AuthContext);
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext);
+
+    useEffect(() => {
+        clearUserContext();
+    }, [clearUserContext]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        console.log("En handleSubmit\n");
         try {
-            await login(email, password);
-            navigate('/home');
+            await registerUser(newUser, password);
+            navigate('/');
         } catch (error) {
-            console.error('Error al conectar:', error);
+            console.error('Error al registrar usuario:', error);
         }
-    };
+    }
 
     return (
-        <div className="flex justify-center mt-[20vh] ">
+        <div className="flex justify-center mt-[20vh]">
             <div className="flex flex-col items-center">
-                <h1 className='text-4xl'>Ingresa tus credenciales</h1>
-                <form onSubmit={handleSubmit} className="w-full mt-4">
+                <h1 className='text-4xl'>¡Únete a alumnchat!</h1>
+                <p className='text-normal mt-2'>Regístrate para empezar a chatear</p>
+                <form className="w-full mt-4" onSubmit={handleSubmit}>
                     <CustomTextInput
                         label="Username"
-                        name="usernam"
+                        name="username"
                         placeholder="tu usuario"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={newUser}
+                        onChange={(e) => setNewUser(e.target.value)}
                     />
                     <CustomTextInput
                         label="Password"
@@ -42,19 +49,13 @@ function Login() {
                     <div className='flex flex-row justify-evenly'>
                         <button type="submit"
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full mt-2">
-                            Log in
-                        </button>
-                        <button type="button"
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-full mt-2"
-                                onClick={() => navigate('/signup')}>
                             Sign Up
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
-    );
+);
 }
 
-export default Login;
+export default SignUp;
