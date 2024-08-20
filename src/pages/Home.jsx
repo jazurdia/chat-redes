@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import {useContext, useEffect, useState} from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
 import ChatWindow from "../components/ChatWindow.jsx";
-import { getMessages, listenForNewMessages } from '../auxiliaryFunctions/connectToXMPP.js';
+import {getMessages, listenForNewMessages, deleteAccount} from '../auxiliaryFunctions/connectToXMPP.js';
 import ContactDisplay from "../components/ContactDisplay.jsx";
 
 function Home() {
-    const { user, logout } = useContext(AuthContext);
+    const {user, logout} = useContext(AuthContext);
     const [messages, setMessages] = useState([]);
     const [conversations, setConversations] = useState({});
     const [selectedConversation, setSelectedConversation] = useState(null);
@@ -70,7 +70,7 @@ function Home() {
             }
         });
 
-        const updatedConversations = { ...conversations }; // Clonar el estado actual
+        const updatedConversations = {...conversations}; // Clonar el estado actual
 
         contactMessages.forEach((message) => {
             const participants = [message.from, message.to].sort().join('-');
@@ -119,14 +119,31 @@ function Home() {
 
     //console.log("conversation", conversations);
 
+    const handleDeleteAccount = async () => {
+        console.log("Boton de eliminar cuenta");
+        try {
+            await deleteAccount(user.client);
+            logout();
+        } catch (error) {
+            console.error('Error al eliminar cuenta:', error);
+        }
+    }
+
     return (
-<div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
-    <div className="w-full text-white bg-slate-700 p-4 space flex justify-around h-[8%]">
+        <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
+            <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
                 <h1 className='text-3xl'>Chat de Alejandro</h1>
-                <button onClick={handleLogout}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Cerrar sesión
-                </button>
+                <div className='flex flex-row gap-4'>
+                    <button onClick={handleLogout}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Cerrar sesión
+                    </button>
+                    <button onClick={handleDeleteAccount}
+                            className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+                        Eliminar Cuenta
+                    </button>
+                </div>
+
             </div>
             <div className='flex flex-row h-full h-[92%] overflow-hidden overflow-y-scroll'>
                 <div className='w-1/3 bg-slate-300'>

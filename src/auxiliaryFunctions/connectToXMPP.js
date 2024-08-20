@@ -207,3 +207,31 @@ export const registerUser = async (newUsername, newPassword) => {
         console.log('Logged out the existing user');
     }
 };
+
+export const deleteAccount = async (client) => {
+    try {
+        // Enviar el IQ request para eliminar la cuenta del usuario
+        const deleteResponse = await client.iqCaller.request(
+            xml(
+                "iq",
+                { type: "set" },
+                xml(
+                    "query",
+                    { xmlns: "jabber:iq:register" },
+                    xml("remove")
+                )
+            )
+        );
+
+        console.log('Delete account response:', deleteResponse);
+
+        if (deleteResponse.attrs.type === 'result') {
+            console.log('User account deleted successfully');
+        } else {
+            throw new Error('Account deletion failed');
+        }
+    } catch (error) {
+        console.error('Failed to delete account:', error);
+        throw error;
+    }
+};
