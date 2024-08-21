@@ -1,3 +1,4 @@
+// src/pages/Home.jsx
 import {useContext, useEffect, useState} from 'react';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
 import ChatWindow from "../components/ChatWindow.jsx";
@@ -13,7 +14,6 @@ import AddedContactDisplay from "../components/AddedContactDisplay.jsx";
 
 function Home() {
     const {user, logout} = useContext(AuthContext);
-    // eslint-disable-next-line no-unused-vars
     const [messages, setMessages] = useState([]);
     const [conversations, setConversations] = useState({});
     const [selectedConversation, setSelectedConversation] = useState(null);
@@ -48,6 +48,7 @@ function Home() {
         const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, message];
+                console.log("tipo de updatedMessages: ", typeof updatedMessages);
                 classifyMessages(updatedMessages);
                 return updatedMessages;
             });
@@ -81,11 +82,19 @@ function Home() {
         };
     }, [user]);
 
-    //console.log("Mesajes recibidos raw: ", messages);
-
     const classifyMessages = (messages) => {
+
+        if (!Array.isArray(messages)) {
+            console.log("En classify messages (home)");
+            console.log("tipo de messages: ", typeof messages);
+            console.log("messages: ", messages);
+            console.error('Expected messages to be an array, but got:', messages);
+            return;
+        }
+
         const groupMessages = [];
         const contactMessages = [];
+        const loggedUserJid = user.client.jid.local + "@alumchat.lol";
 
         messages.forEach((message) => {
             if ((message.from && message.from.includes("conference")) || (message.to && message.to.includes("conference"))) {
@@ -104,14 +113,14 @@ function Home() {
             }
         });
 
-        const updatedConversations = {...conversations}; // Clonar el estado actual
+        const updatedConversations = {...conversations}; // Clone the current state
 
         contactMessages.forEach((message) => {
-            const participants = [message.from, message.to].sort().join('-');
-            if (!updatedConversations[participants]) {
-                updatedConversations[participants] = [];
+            const otherParticipant = message.from === loggedUserJid ? message.to : message.from;
+            if (!updatedConversations[otherParticipant]) {
+                updatedConversations[otherParticipant] = [];
             }
-            updatedConversations[participants].push(message);
+            updatedConversations[otherParticipant].push(message);
         });
 
         groupMessages.forEach((message) => {
@@ -123,8 +132,8 @@ function Home() {
         });
 
         setConversations(updatedConversations);
+        console.log("(HOME) Conversaciones actualizadas: \n", updatedConversations);
     };
-
     const handleLogout = () => {
         logout();
     };
@@ -150,24 +159,11 @@ function Home() {
             setIsGroup(foundConversation.includes('conference'));
             setDestinatary(contactJid);
         } else {
-            const newConversationId = `${loggedUser}-${contactJid}`;
-            const defaultMessage = {
-                from: loggedUser,
-                to: contactJid,
-                body: "¡Hola! Estoy iniciando esta conversación.",
-                timestamp: new Date().toISOString(),
-            };
-
-            setConversations((prevConversations) => ({
-                ...prevConversations,
-                [newConversationId]: [defaultMessage],
-            }));
-            setSelectedConversation(newConversationId);
+            setSelectedConversation(contactJid);
             setIsGroup(false);
             setDestinatary(contactJid);
         }
     };
-
     const handleDeleteAccount = async () => {
         console.log("Boton de eliminar cuenta");
         try {
@@ -223,7 +219,10 @@ function Home() {
                 <div className='w-2/3 bg-slate-400 overflow-hidden overflow-y-scroll scrollbar-hide'>
                     <ChatWindow messages={selectedConversation ? conversations[selectedConversation] : []}
                                 destinatary={destinatary}
-                                setMessages={setMessages}
+                                setMessages={(newMessages) => {
+                                    setMessages(newMessages);
+                                    classifyMessages(newMessages);
+                                }}
                     />
                 </div>
             </div>

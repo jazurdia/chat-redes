@@ -1,20 +1,16 @@
+// src/components/ContactDisplay.jsx
 import {useContext} from 'react';
 import PropTypes from 'prop-types';
 import AuthContext from "../auxiliaryFunctions/AuthContext.jsx";
 
 function ContactDisplay({ contactId, lastMessage, isGroup, onClick }) {
-    // Eliminar todo lo que va después del @ en el contactId
-
-    /*
-    contactId es id de la conversacion. es importante tomar en cuenta esto para la lógica posterior.
-    displayedContactId es el id que se muestra en pantalla(aunque no es real).
-     */
-
     const { user } = useContext(AuthContext);
     const loggedUser = user.client.jid.local;
 
+    //console.log("En ContactDisplay, loggedUser:", loggedUser);
+
     const displayedContactId = contactId.replace(loggedUser + "@alumchat.lol", '').replace('-', '');
-    //console.log("displayedContactId", displayedContactId);
+    //console.log("En ContactDisplay, contactId:", contactId);
 
     return (
         <div className='p-2' onClick={onClick}>
