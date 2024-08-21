@@ -117,6 +117,7 @@ export const listenForNewMessages = (client, callback) => {
 export const sendMessage = async (client, to, body) => {
     const from = client.jid.toString();
 
+    console.log("#############################")
     console.log("En send message\n")
     console.log("from: ", from)
     console.log("to: ", to)

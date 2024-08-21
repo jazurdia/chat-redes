@@ -130,22 +130,41 @@ function Home() {
     };
 
     const handleSelectConversation = (contactId) => {
-        setSelectedConversation(contactId);
-        setIsGroup(contactId.includes('conference'));
-        console.log("Selected conversations: ", contactId);
-        console.log("Is group: ", isGroup);
+        const loggedUser = user.client.jid.local + "@alumchat.lol";
+        let contactJid = contactId.includes(loggedUser) ? contactId : `${contactId}@alumchat.lol`;
 
-        // obtener destinatario
-        const logged_user = user.client.jid.local + "@alumchat.lol";
+        // Ensure only one instance of '@alumchat.lol'
+        if (contactJid.split('@alumchat.lol').length > 2) {
+            contactJid = contactJid.replace('@alumchat.lol@alumchat.lol', '@alumchat.lol');
+        }
 
-        if (!isGroup) {
-            if (contactId.includes(logged_user)) {
-                const contact = contactId.replace(logged_user, '').replace('-', '');
-                setDestinatary(contact);
-                //console.log("Destinatario: ", destinatary);
-            } else {
-                console.log("Algo salio mal al obtener el destinatario");
+        let foundConversation = null;
+        Object.keys(conversations).forEach((convId) => {
+            if (convId.includes(contactJid)) {
+                foundConversation = convId;
             }
+        });
+
+        if (foundConversation) {
+            setSelectedConversation(foundConversation);
+            setIsGroup(foundConversation.includes('conference'));
+            setDestinatary(contactJid);
+        } else {
+            const newConversationId = `${loggedUser}-${contactJid}`;
+            const defaultMessage = {
+                from: loggedUser,
+                to: contactJid,
+                body: "¡Hola! Estoy iniciando esta conversación.",
+                timestamp: new Date().toISOString(),
+            };
+
+            setConversations((prevConversations) => ({
+                ...prevConversations,
+                [newConversationId]: [defaultMessage],
+            }));
+            setSelectedConversation(newConversationId);
+            setIsGroup(false);
+            setDestinatary(contactJid);
         }
     };
 
