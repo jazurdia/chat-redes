@@ -65,35 +65,19 @@ export const getMessages = async (client) => {
         client.on('stanza', handleStanza);
 
         // MAM query to retrieve all archived messages
-        /*
+
         const mamRequestStanza = xml(
             'iq',
             {type: 'set', id: 'get-messages'},
-            xml('query', {xmlns: 'urn:xmpp:mam:2'},
-                xml('x', {xmlns: 'jabber:x:data', type: 'submit'},
-                    xml('field', {var: 'FORM_TYPE', type: 'hidden'},
-                        xml('value', {}, 'urn:xmpp:mam:2')
-                    )
-                )
-            )
+            xml('query', {xmlns: 'urn:xmpp:mam:2'})
         );
 
+        /** nota:
+         * query mamon regresa lo que pinches quiere
+         * probe 50 formas diferentes, regresa los mismo 28 mensajes que saber como decide meter
+         * porque no son ni los últimos, ni los primeros, ni los mas fáciles de encontrar por orden alfabético.
+         * no entiendo como M pedir esto de manera ordenada.
          */
-
-        const mamRequestStanza = xml(
-            'iq',
-            {type: 'set', id: 'get-messages'},
-            xml('query', {xmlns: 'urn:xmpp:mam:2'},
-                xml('x', {xmlns: 'jabber:x:data', type: 'submit'},
-                    xml('field', {var: 'FORM_TYPE', type: 'hidden'},
-                        xml('value', {}, 'urn:xmpp:mam:2')
-                    ),
-                    xml('field', {var: 'start'}, // Fecha de inicio opcional
-                        xml('value', {}, '2024-01-01T00:00:00Z') // Reemplaza con la fecha de inicio que desees
-                    ),
-                )
-            )
-        );
 
 
         client.send(mamRequestStanza);
@@ -101,7 +85,7 @@ export const getMessages = async (client) => {
         setTimeout(() => {
             client.removeListener('stanza', handleStanza); // Remove the event listener
             resolve(stanzas);
-        }, 8000);
+        }, 1000);
     });
 };
 
