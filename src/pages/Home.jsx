@@ -20,9 +20,7 @@ function Home() {
             try {
                 const fetchedMessages = await getMessages(user.client);
                 setMessages(fetchedMessages);
-                console.log("fetched messages", fetchedMessages);
                 classifyMessages(fetchedMessages);
-                console.log("classified messages", fetchedMessages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
@@ -38,6 +36,7 @@ function Home() {
             }
         }
 
+        // Define the callback function in Home.jsx
         const handleNewMessage = (message) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, message];

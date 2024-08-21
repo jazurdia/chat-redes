@@ -15,8 +15,11 @@ export const connectToXMPP = async (jid, password) => {
     try {
         await client.start();
 
-        // Send presence stanza to indicate the user is online
-        const presenceStanza = xml('presence');
+        // Send presence stanza to indicate the user is online with show and status
+        const presenceStanza = xml('presence', {},
+            xml('show', {}, 'chat'),
+            xml('status', {}, 'ready to chat')
+        );
         client.send(presenceStanza);
 
         return client;
@@ -100,21 +103,14 @@ export const listenForNewMessages = (client, callback) => {
             }
 
             console.log('Received message:', body, '\nfrom:', from, '\nto:', to);
-
         }
     };
 
     client.on('stanza', handleStanza);
 
-    // Poll for new messages every 3 seconds
-    const intervalId = setInterval(() => {
-        client.send(xml('presence')); // Send a presence stanza to keep the connection alive
-    }, 3000);
-
-    // Return a function to remove the listener and clear the interval when needed
+    // Return a function to remove the listener when needed
     return () => {
         client.removeListener('stanza', handleStanza);
-        clearInterval(intervalId);
     };
 };
 
