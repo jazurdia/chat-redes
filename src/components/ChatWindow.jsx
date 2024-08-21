@@ -1,11 +1,10 @@
-// src/components/ChatWindow.jsx
 import { useRef, useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import AuthContext from "../auxiliaryFunctions/AuthContext.jsx";
 import { sendMessage } from '../auxiliaryFunctions/connectToXMPP.js';
 import MessageItem from './MessageItem.jsx';
 
-function ChatWindow({ messages = [], destinatary, setMessages }) {
+function ChatWindow({ destinatary, addMessageToConversation, selectedMessages }) {
     const messagesEndRef = useRef(null);
     const [toSelected, setToSelected] = useState("");
     const [messageText, setMessageText] = useState("");
@@ -14,8 +13,7 @@ function ChatWindow({ messages = [], destinatary, setMessages }) {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setToSelected(destinatary);
-        console.log("Destinatario: ", destinatary);
-    }, [messages, destinatary]);
+    }, [destinatary]);
 
     const handleSendMessage = async () => {
         if (messageText.trim() === "") return;
@@ -23,19 +21,16 @@ function ChatWindow({ messages = [], destinatary, setMessages }) {
             await sendMessage(user.client, toSelected, messageText);
             setMessageText(""); // Clear the input field after sending the message
 
-            console.log("Ha entrado a ChatWindow.handleSendMessage");
-
-            // add the sent message to chat
             const timestamp = new Date().toISOString();
             const newMessage = {
-                from: user.client.jid.local.toString() + '@' + user.client.jid.domain.toString(),
+                from: user.client.jid.local + '@' + user.client.jid.domain,
                 to: toSelected,
                 body: messageText,
                 timestamp,
             };
 
-            const updatedMessages = [...messages, newMessage];
-            setMessages(updatedMessages);
+            // add the sent message to chat
+            addMessageToConversation(newMessage);
         } catch (error) {
             console.error('Failed to send message:', error);
         }
@@ -44,7 +39,7 @@ function ChatWindow({ messages = [], destinatary, setMessages }) {
     return (
         <div className='w-full h-full px-2 flex flex-col overflow-hidden p-2'>
             <div className='h-[95%] flex-col overflow-hidden overflow-y-scroll scrollbar-hide'>
-                {messages.map((message, index) => (
+                {selectedMessages && selectedMessages.map((message, index) => (
                     <MessageItem
                         key={index}
                         body={message.body}
@@ -75,12 +70,12 @@ function ChatWindow({ messages = [], destinatary, setMessages }) {
 
 ChatWindow.propTypes = {
     destinatary: PropTypes.string,
-    setMessages: PropTypes.func.isRequired,
-    messages: PropTypes.arrayOf(PropTypes.shape({
-        from: PropTypes.string.isRequired,
+    addMessageToConversation: PropTypes.func.isRequired,
+    selectedMessages: PropTypes.arrayOf(PropTypes.shape({
         body: PropTypes.string.isRequired,
+        from: PropTypes.string.isRequired,
         timestamp: PropTypes.string.isRequired,
-    })).isRequired,
+    })),
 };
 
 export default ChatWindow;
