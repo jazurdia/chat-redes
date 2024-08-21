@@ -161,10 +161,10 @@ export const registerUser = async (newUsername, newPassword) => {
         const registrationResponse = await client.iqCaller.request(
             xml(
                 "iq",
-                { type: "set" },
+                {type: "set"},
                 xml(
                     "query",
-                    { xmlns: "jabber:iq:register" },
+                    {xmlns: "jabber:iq:register"},
                     xml("username", {}, newUsername),
                     xml("password", {}, newPassword)
                 )
@@ -210,10 +210,10 @@ export const deleteAccount = async (client) => {
         const deleteResponse = await client.iqCaller.request(
             xml(
                 "iq",
-                { type: "set" },
+                {type: "set"},
                 xml(
                     "query",
-                    { xmlns: "jabber:iq:register" },
+                    {xmlns: "jabber:iq:register"},
                     xml("remove")
                 )
             )
@@ -239,15 +239,15 @@ export const getContacts = async (client) => {
         const rosterResponse = await client.iqCaller.request(
             xml(
                 'iq',
-                { type: 'get' },
+                {type: 'get'},
                 xml(
                     'query',
-                    { xmlns: 'jabber:iq:roster' }
+                    {xmlns: 'jabber:iq:roster'}
                 )
             )
         );
 
-        console.log('Roster response:', rosterResponse);
+        //console.log('Roster response:', rosterResponse);
 
         if (rosterResponse.attrs.type === 'result') {
             const contacts = [];
@@ -255,7 +255,6 @@ export const getContacts = async (client) => {
             items.forEach(item => {
                 contacts.push({
                     jid: item.attrs.jid,
-                    name: item.attrs.name || '',
                     subscription: item.attrs.subscription || 'none'
                 });
             });
@@ -268,3 +267,30 @@ export const getContacts = async (client) => {
         throw error;
     }
 };
+
+export const listenForStatusChanges = (client, callback) => {
+    const handleStanza = (stanza) => {
+        if (stanza.is('presence')) {
+            const status = stanza.getChildText('status');
+            const show = stanza.getChildText('show');
+            const from = stanza.attrs.from;
+
+            if (status || show) {
+                callback({
+                    from,
+                    status,
+                    show,
+                });
+            }
+
+            console.log('Received presence:', '\nfrom:', from, '\nstatus:', status, '\nshow:', show);
+        }
+    };
+
+    client.on('stanza', handleStanza);
+
+    // Return a function to remove the listener when needed
+    return () => {
+        client.removeListener('stanza', handleStanza);
+    };
+}
