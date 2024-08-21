@@ -41,10 +41,13 @@ export const getMessages = async (client) => {
                 if (forwarded) {
                     const message = forwarded.getChild('message', 'jabber:client');
                     const body = message.getChildText('body');
-                    const from = message.attrs.from;
+                    let from = message.attrs.from;
                     const to = message.attrs.to; // Extraer el campo 'to'
                     const timestamp = forwarded.getChild('delay', 'urn:xmpp:delay').attrs.stamp;
                     const messageId = message.attrs.id;
+
+                    // Normalize the 'from' attribute
+                    from = from.split('@alumchat.lol')[0] + '@alumchat.lol';
 
                     if (!processedMessageIds.has(messageId)) {
                         processedMessageIds.add(messageId);
@@ -62,6 +65,7 @@ export const getMessages = async (client) => {
         client.on('stanza', handleStanza);
 
         // MAM query to retrieve all archived messages
+        /*
         const mamRequestStanza = xml(
             'iq',
             {type: 'set', id: 'get-messages'},
@@ -74,14 +78,30 @@ export const getMessages = async (client) => {
             )
         );
 
-        //console.log('Sending MAM request stanza:\n', mamRequestStanza.toString());
+         */
+
+        const mamRequestStanza = xml(
+            'iq',
+            {type: 'set', id: 'get-messages'},
+            xml('query', {xmlns: 'urn:xmpp:mam:2'},
+                xml('x', {xmlns: 'jabber:x:data', type: 'submit'},
+                    xml('field', {var: 'FORM_TYPE', type: 'hidden'},
+                        xml('value', {}, 'urn:xmpp:mam:2')
+                    ),
+                    xml('field', {var: 'start'}, // Fecha de inicio opcional
+                        xml('value', {}, '2024-01-01T00:00:00Z') // Reemplaza con la fecha de inicio que desees
+                    ),
+                )
+            )
+        );
+
 
         client.send(mamRequestStanza);
 
         setTimeout(() => {
             client.removeListener('stanza', handleStanza); // Remove the event listener
             resolve(stanzas);
-        }, 5000);
+        }, 8000);
     });
 };
 
@@ -89,9 +109,13 @@ export const listenForNewMessages = (client, callback) => {
     const handleStanza = (stanza) => {
         if (stanza.is('message') && stanza.attrs.type === 'chat') {
             const body = stanza.getChildText('body');
-            const from = stanza.attrs.from;
+            let from = stanza.attrs.from;
             const to = stanza.attrs.to;
             const timestamp = new Date().toISOString(); // Use current timestamp for new messages
+
+            // Normalize the 'from' attribute
+            // esto es solo para los individuales.
+            from = from.split('@alumchat.lol')[0] + '@alumchat.lol';
 
             if (body) {
                 callback({
@@ -248,14 +272,17 @@ export const getContacts = async (client) => {
             )
         );
 
-        //console.log('Roster response:', rosterResponse);
-
         if (rosterResponse.attrs.type === 'result') {
             const contacts = [];
             const items = rosterResponse.getChild('query', 'jabber:iq:roster').getChildren('item');
             items.forEach(item => {
+                let jid = item.attrs.jid;
+
+                // Normalize the 'jid' attribute
+                jid = jid.split('@alumchat.lol')[0] + '@alumchat.lol';
+
                 contacts.push({
-                    jid: item.attrs.jid,
+                    jid,
                     subscription: item.attrs.subscription || 'none'
                 });
             });
@@ -274,7 +301,10 @@ export const listenForStatusChanges = (client, callback) => {
         if (stanza.is('presence')) {
             const status = stanza.getChildText('status');
             const show = stanza.getChildText('show');
-            const from = stanza.attrs.from;
+            let from = stanza.attrs.from;
+
+            // Normalize the 'from' attribute
+            from = from.split('@alumchat.lol')[0] + '@alumchat.lol';
 
             if (status || show) {
                 callback({

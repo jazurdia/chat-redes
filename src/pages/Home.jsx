@@ -26,11 +26,13 @@ function Home() {
         const fetchMessages = async () => {
             try {
                 const fetchedMessages = await getMessages(user.client);
+                console.log("fetchedMessages", fetchedMessages);
                 classifyMessages(fetchedMessages);
             } catch (error) {
                 console.error('Error fetching messages:', error);
             }
         };
+
 
         const fetchContacts = async () => {
             try {
@@ -63,6 +65,7 @@ function Home() {
             removeStatusListener = listenForStatusChanges(user.client, handleStatusChange);
         }
 
+        // Cleanup de los listeners
         return () => {
             if (removeListener) {
                 removeListener();
@@ -125,11 +128,13 @@ function Home() {
         // Extraer el identificador base sin el recurso (/web) para usuarios individuales
         const normalizeJid = (jid) => jid.split('@alumchat.lol')[0] + '@alumchat.lol';
 
+        console.log("newMessage", newMessage);
         const otherParticipant = normalizeJid(
             newMessage.from === (user.client.jid.local + "@alumchat.lol")
                 ? newMessage.to
                 : newMessage.from
         );
+        console.log("otherParticipant", otherParticipant.from, otherParticipant.to);
 
         setConversations((prevConversations) => {
             // Clone the existing conversations
