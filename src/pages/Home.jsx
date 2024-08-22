@@ -6,16 +6,19 @@ import {
     listenForNewMessages,
     deleteAccount,
     getContacts,
-    listenForStatusChanges
+    listenForStatusChanges,
+    addContact,
 } from '../auxiliaryFunctions/connectToXMPP.js';
 import ContactDisplay from "../components/ContactDisplay.jsx";
 import AddedContactDisplay from "../components/AddedContactDisplay.jsx";
+import SearchForContact from "../components/SearchForContact.jsx";
 
 function Home() {
     const {user, logout} = useContext(AuthContext);
     const [conversations, setConversations] = useState({});
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [destinatary, setDestinatary] = useState("");
+    // eslint-disable-next-line no-unused-vars
     const [isGroup, setIsGroup] = useState(false);
     const [contacts, setContacts] = useState([]);
 
@@ -32,7 +35,6 @@ function Home() {
                 console.error('Error fetching messages:', error);
             }
         };
-
 
         const fetchContacts = async () => {
             try {
@@ -152,7 +154,6 @@ function Home() {
         });
     };
 
-
     const handleLogout = () => {
         logout();
     };
@@ -192,6 +193,16 @@ function Home() {
         }
     };
 
+    const handleAddContact = async (contactJid) => {
+        try {
+            await addContact(user.client, contactJid);
+            const updatedContacts = await getContacts(user.client);
+            setContacts(updatedContacts);
+        } catch (error) {
+            console.error('Error al añadir contacto:', error);
+        }
+    }
+
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
             <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
@@ -222,6 +233,7 @@ function Home() {
                     </div>
                     <div>
                         <p className='p-2 text-xl'>Contactos</p>
+                        <SearchForContact onAddContact={handleAddContact}/>
                         {contacts.map((contact) => (
                             <AddedContactDisplay
                                 key={contact.jid}

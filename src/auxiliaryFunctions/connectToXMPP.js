@@ -125,12 +125,7 @@ export const listenForNewMessages = (client, callback) => {
 export const sendMessage = async (client, to, body) => {
     const from = client.jid.toString();
 
-    console.log("#############################")
-    console.log("En send message\n")
-    console.log("from: ", from)
-    console.log("to: ", to)
-    console.log("body: ", body)
-
+    console.log("Mensaje enviado:",from, to, body);
 
     const messageStanza = xml(
         'message',
@@ -309,3 +304,31 @@ export const listenForStatusChanges = (client, callback) => {
         client.removeListener('stanza', handleStanza);
     };
 }
+
+export const addContact = async (client, jid) => {
+    try {
+        // Enviar el IQ request para añadir un nuevo contacto
+        const addContactResponse = await client.iqCaller.request(
+            xml(
+                'iq',
+                {type: 'set'},
+                xml(
+                    'query',
+                    {xmlns: 'jabber:iq:roster'},
+                    xml('item', {jid})
+                )
+            )
+        );
+
+        console.log('Add contact response:', addContactResponse);
+
+        if (addContactResponse.attrs.type === 'result') {
+            console.log('Contact added successfully');
+        } else {
+            throw new Error('Failed to add contact');
+        }
+    } catch (error) {
+        console.error('Failed to add contact:', error);
+        throw error;
+    }
+};
