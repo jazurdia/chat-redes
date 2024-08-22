@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomTextInput from '../components/CustomTextInput';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
+import ChangePresence from "../components/ChangePresence.jsx";
 
 function Login() {
     const [email, setEmail] = useState('');

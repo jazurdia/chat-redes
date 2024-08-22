@@ -236,35 +236,28 @@ export const deleteAccount = async (client) => {
     }
 };
 
-
 export const getContacts = async (client) => {
     try {
-        // Enviar el IQ request para obtener la lista de contactos
-        const rosterResponse = await client.iqCaller.request(
-            xml(
-                'iq',
-                {type: 'get'},
-                xml(
-                    'query',
-                    {xmlns: 'jabber:iq:roster'}
-                )
-            )
+        const response = await client.iqCaller.request(
+            xml('iq', {type: 'get'}, xml('query', {xmlns: 'jabber:iq:roster'}))
         );
 
-        if (rosterResponse.attrs.type === 'result') {
+        if (response.attrs.type === 'result') {
+            const items = response.getChild('query').getChildren('item');
+            const uniqueJids = new Set();
             const contacts = [];
-            const items = rosterResponse.getChild('query', 'jabber:iq:roster').getChildren('item');
-            items.forEach(item => {
-                let jid = item.attrs.jid;
 
-                // Normalize the 'jid' attribute
-                jid = jid.split('@alumchat.lol')[0] + '@alumchat.lol';
-
-                contacts.push({
-                    jid,
-                    subscription: item.attrs.subscription || 'none'
-                });
+            items.forEach((item) => {
+                const jid = item.attrs.jid;
+                if (!uniqueJids.has(jid)) {
+                    uniqueJids.add(jid);
+                    contacts.push({
+                        jid,
+                        subscription: item.attrs.subscription || 'none'
+                    });
+                }
             });
+
             return contacts;
         } else {
             throw new Error('Failed to retrieve contacts');
@@ -329,6 +322,48 @@ export const addContact = async (client, jid) => {
         }
     } catch (error) {
         console.error('Failed to add contact:', error);
+        throw error;
+    }
+};
+
+export const changePresence = async (client, show, status) => {
+    try {
+        const presenceStanza = xml('presence', {},
+            xml('show', {}, show),
+            xml('status', {}, status)
+        );
+        await client.send(presenceStanza);
+        console.log('Presence changed successfully');
+    } catch (error) {
+        console.error('Failed to change presence:', error);
+        throw error;
+    }
+};
+
+export const removeContact = async (client, jid) => {
+    try {
+        // Send the IQ request to remove a contact
+        const removeContactResponse = await client.iqCaller.request(
+            xml(
+                'iq',
+                {type: 'set'},
+                xml(
+                    'query',
+                    {xmlns: 'jabber:iq:roster'},
+                    xml('item', {jid, subscription: 'remove'})
+                )
+            )
+        );
+
+        console.log('Remove contact response:', removeContactResponse);
+
+        if (removeContactResponse.attrs.type === 'result') {
+            console.log('Contact removed successfully');
+        } else {
+            throw new Error('Failed to remove contact');
+        }
+    } catch (error) {
+        console.error('Failed to remove contact:', error);
         throw error;
     }
 };

@@ -10,6 +10,8 @@ function App() {
     const navigate = useNavigate();
     const { user, isAuthenticated } = useContext(AuthContext);
 
+    console.log("From App.jsx", isAuthenticated());
+
     useEffect(() => {
         if (user) {
             navigate('/home');

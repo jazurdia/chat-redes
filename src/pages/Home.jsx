@@ -12,6 +12,7 @@ import {
 import ContactDisplay from "../components/ContactDisplay.jsx";
 import AddedContactDisplay from "../components/AddedContactDisplay.jsx";
 import SearchForContact from "../components/SearchForContact.jsx";
+import ChangePresence from "../components/ChangePresence.jsx";
 
 function Home() {
     const {user, logout} = useContext(AuthContext);
@@ -21,6 +22,7 @@ function Home() {
     // eslint-disable-next-line no-unused-vars
     const [isGroup, setIsGroup] = useState(false);
     const [contacts, setContacts] = useState([]);
+    const [isChangePresenceVisible, setIsChangePresenceVisible] = useState(false);
 
     useEffect(() => {
         let removeListener;
@@ -136,7 +138,6 @@ function Home() {
                 ? newMessage.to
                 : newMessage.from
         );
-        console.log("otherParticipant", otherParticipant.from, otherParticipant.to);
 
         setConversations((prevConversations) => {
             // Clone the existing conversations
@@ -203,11 +204,19 @@ function Home() {
         }
     }
 
+    const handleChangePresence = () => {
+        setIsChangePresenceVisible(!isChangePresenceVisible);
+    };
+
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
             <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
                 <p className='text-3xl px-2'>🔵 {user.client.jid.local}</p>
                 <div className='flex flex-row gap-4'>
+                    <button onClick={handleChangePresence}
+                            className="bg-blue-700 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">
+                        Cambiar Presencia
+                    </button>
                     <button onClick={handleLogout}
                             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                         Cerrar sesión
@@ -253,6 +262,19 @@ function Home() {
                     />
                 </div>
             </div>
+            {isChangePresenceVisible && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative bg-white p-4 rounded shadow-lg">
+                        <button
+                            onClick={handleChangePresence}
+                            className="absolute top-2 right-2"
+                        >
+                            ❌
+                        </button>
+                        <ChangePresence />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
