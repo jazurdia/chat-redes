@@ -1,7 +1,7 @@
 import {useState} from "react";
 import PropTypes from "prop-types";
 
-function SearchForContact({onAddContact}) {
+function SearchForContact({onAddContact, placeholder}) {
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleSearch = (e) => {
@@ -19,7 +19,7 @@ function SearchForContact({onAddContact}) {
         <div className="flex items-center space-x-2 p-2">
             <input
                 type="text"
-                placeholder="Nuevo Contacto"
+                placeholder={placeholder}
                 value={searchTerm}
                 onChange={handleSearch}
                 className="border border-gray-300 rounded-md p-2 flex-grow"
@@ -39,4 +39,5 @@ export default SearchForContact;
 // props
 SearchForContact.propTypes = {
     onAddContact: PropTypes.func.isRequired,
+    placeholder: PropTypes.string.isRequired,
 };

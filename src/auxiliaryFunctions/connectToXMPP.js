@@ -355,3 +355,24 @@ export const removeContact = async (client, jid) => {
         throw error;
     }
 };
+
+export const listenForNotifications = (client, callback) => {
+
+    const handleStanza = (stanza) => {
+        if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
+            console.log('Received presence stanza:', stanza.toString());
+            const from = stanza.attrs.from;
+            callback({
+                type: 'contact_request',
+                from,
+            });
+        }
+    };
+
+    client.on('stanza', handleStanza);
+
+    // Return a function to remove the listener when needed
+    return () => {
+        client.removeListener('stanza', handleStanza);
+    };
+};

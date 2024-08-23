@@ -8,11 +8,13 @@ import {
     getContacts,
     listenForStatusChanges,
     addContact,
+    listenForNotifications,
 } from '../auxiliaryFunctions/connectToXMPP.js';
 import ContactDisplay from "../components/ContactDisplay.jsx";
 import AddedContactDisplay from "../components/AddedContactDisplay.jsx";
 import SearchForContact from "../components/SearchForContact.jsx";
 import ChangePresence from "../components/ChangePresence.jsx";
+import Notifications from "../components/Notifications.jsx";
 
 function Home() {
     const {user, logout} = useContext(AuthContext);
@@ -23,10 +25,13 @@ function Home() {
     const [isGroup, setIsGroup] = useState(false);
     const [contacts, setContacts] = useState([]);
     const [isChangePresenceVisible, setIsChangePresenceVisible] = useState(false);
+    const [areNotificationsVisible, setAreNotificationsVisible] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         let removeListener;
         let removeStatusListener;
+        let removeNotificationListener;
 
         const fetchMessages = async () => {
             try {
@@ -62,21 +67,23 @@ function Home() {
             });
         };
 
+        const handleNotification = (notification) => {
+            setNotifications((prevNotifications) => [...prevNotifications, notification]);
+        }
+
         if (user && user.client) {
             fetchMessages();
             fetchContacts();
             removeListener = listenForNewMessages(user.client, handleNewMessage);
             removeStatusListener = listenForStatusChanges(user.client, handleStatusChange);
+            removeNotificationListener = listenForNotifications(user.client, handleNotification);
         }
 
         // Cleanup de los listeners
         return () => {
-            if (removeListener) {
-                removeListener();
-            }
-            if (removeStatusListener) {
-                removeStatusListener();
-            }
+            if (removeListener) removeListener();
+            if (removeStatusListener) removeStatusListener();
+            if (removeNotificationListener) removeNotificationListener();
         };
     }, [user]);
 
@@ -208,10 +215,23 @@ function Home() {
         setIsChangePresenceVisible(!isChangePresenceVisible);
     };
 
+    const handleNotificationsVisibility = () => {
+        setAreNotificationsVisible(!areNotificationsVisible);
+    }
+
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
             <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
-                <p className='text-3xl px-2'>🔵 {user.client.jid.local}</p>
+                <div className='flex flex-row gap-12'>
+                    <p className='text-3xl px-2'>🔵 {user.client.jid.local}</p>
+                    <button onClick={handleNotificationsVisibility}>
+                        <img
+                            src="/notifications-active-svgrepo-com.svg"
+                            alt="Notificaciones"
+                            className="w-8 h-8 hover:opacity-50"
+                        />
+                    </button>
+                </div>
                 <div className='flex flex-row gap-4'>
                     <button onClick={handleChangePresence}
                             className="bg-blue-700 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">
@@ -242,7 +262,7 @@ function Home() {
                     </div>
                     <div>
                         <p className='p-2 text-xl'>Contactos</p>
-                        <SearchForContact onAddContact={handleAddContact}/>
+                        <SearchForContact onAddContact={handleAddContact} placeholder={'Nuevo Contacto'}/>
                         {contacts.map((contact) => (
                             <AddedContactDisplay
                                 key={contact.jid}
@@ -272,6 +292,19 @@ function Home() {
                             ❌
                         </button>
                         <ChangePresence />
+                    </div>
+                </div>
+            )}
+            {areNotificationsVisible && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="relative bg-white p-4 rounded shadow-lg">
+                        <button
+                            onClick={handleNotificationsVisibility}
+                            className="absolute top-2 right-2"
+                        >
+                            ❌
+                        </button>
+                        <Notifications notifications={notifications} /> {/* Pasar notificaciones al componente */}
                     </div>
                 </div>
             )}
