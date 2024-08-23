@@ -374,13 +374,22 @@ export const removeContact = async (client, jid) => {
 export const listenForNotifications = (client, callback) => {
 
     const handleStanza = (stanza) => {
-        if (stanza.is('presence') && stanza.attrs.type === 'subscribe') {
-            console.log('Received presence stanza:', stanza.toString());
+        if (stanza.is('presence')) {
             const from = stanza.attrs.from;
-            callback({
-                type: 'contact_request',
-                from,
-            });
+
+            if (stanza.attrs.type === 'subscribe') {
+                console.log('Received presence subscribe stanza:', stanza.toString());
+                callback({
+                    type: 'contact_request',
+                    from,
+                });
+            } else if (stanza.attrs.type === 'unsubscribe' || stanza.attrs.type === 'unsubscribed') {
+                console.log('Received presence unsubscribe/unsubscribed stanza:', stanza.toString());
+                callback({
+                    type: 'contact_removed',
+                    from,
+                });
+            }
         }
     };
 
