@@ -11,9 +11,12 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
     const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setToSelected(destinatary);
     }, [destinatary]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [selectedMessages]);
 
     const handleSendMessage = async () => {
         if (messageText.trim() === "") return;
@@ -56,6 +59,11 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
                     className="flex-grow h-full px-2 bg-transparent outline-none"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSendMessage().then(r => r);
+                        }
+                    }}
                 />
                 <button
                     className="ml-2 px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"

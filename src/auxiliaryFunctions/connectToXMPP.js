@@ -110,7 +110,6 @@ export const listenForNewMessages = (client, callback) => {
                 });
             }
 
-            console.log('Received message:', body, '\nfrom:', from, '\nto:', to);
         }
     };
 
@@ -124,9 +123,6 @@ export const listenForNewMessages = (client, callback) => {
 
 export const sendMessage = async (client, to, body) => {
     const from = client.jid.toString();
-
-    console.log("Mensaje enviado:",from, to, body);
-
     const messageStanza = xml(
         'message',
         {type: 'chat', to, from},
@@ -175,8 +171,6 @@ export const registerUser = async (newUsername, newPassword) => {
             )
         );
 
-        console.log('Registration response:', registrationResponse);
-
         if (registrationResponse.attrs.type === 'result') {
             console.log('User registered successfully');
         } else {
@@ -197,7 +191,6 @@ export const registerUser = async (newUsername, newPassword) => {
 
         await newUserClient.start();
         await newUserClient.stop();
-        console.log('Logged out the new user');
     } catch (error) {
         console.error('Failed to register:', error);
         throw error;
@@ -285,8 +278,6 @@ export const listenForStatusChanges = (client, callback) => {
                     show,
                 });
             }
-
-            console.log('Received presence:', '\nfrom:', from, '\nstatus:', status, '\nshow:', show);
         }
     };
 
@@ -313,8 +304,6 @@ export const addContact = async (client, jid) => {
             )
         );
 
-        console.log('Add contact response:', addContactResponse);
-
         if (addContactResponse.attrs.type === 'result') {
             console.log('Contact added successfully');
         } else {
@@ -333,7 +322,6 @@ export const changePresence = async (client, show, status) => {
             xml('status', {}, status)
         );
         await client.send(presenceStanza);
-        console.log('Presence changed successfully');
     } catch (error) {
         console.error('Failed to change presence:', error);
         throw error;
