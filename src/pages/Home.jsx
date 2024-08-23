@@ -219,6 +219,23 @@ function Home() {
         setAreNotificationsVisible(!areNotificationsVisible);
     }
 
+    const handleAcceptContactRequest = async (contactJid) => {
+        console.log('lo que llega a handleAcceptContactRequest es :', contactJid);
+
+        try {
+            await addContact(user.client, contactJid);
+            const updatedContacts = await getContacts(user.client);
+            setContacts(updatedContacts);
+        } catch (error) {
+            console.error('Error al añadir contacto:', error);
+        }
+
+        // Actualiza el estado de las notificaciones
+        setNotifications((prevNotifications) => {
+            return prevNotifications.filter((notification) => notification.from !== contactJid);
+        });
+    };
+
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
             <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
@@ -291,7 +308,7 @@ function Home() {
                         >
                             ❌
                         </button>
-                        <ChangePresence />
+                        <ChangePresence/>
                     </div>
                 </div>
             )}
@@ -304,7 +321,8 @@ function Home() {
                         >
                             ❌
                         </button>
-                        <Notifications notifications={notifications} /> {/* Pasar notificaciones al componente */}
+                        <Notifications notifications={notifications}
+                                       onAcceptContactRequest={handleAcceptContactRequest}/> {/* Pasar notificaciones al componente */}
                     </div>
                 </div>
             )}

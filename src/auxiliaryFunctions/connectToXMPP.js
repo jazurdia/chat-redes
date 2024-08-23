@@ -290,8 +290,10 @@ export const listenForStatusChanges = (client, callback) => {
 }
 
 export const addContact = async (client, jid) => {
+
+    console.log("Adding contact with JID:", jid);
+
     try {
-        // Enviar el IQ request para añadir un nuevo contacto
         const addContactResponse = await client.iqCaller.request(
             xml(
                 'iq',
@@ -304,8 +306,21 @@ export const addContact = async (client, jid) => {
             )
         );
 
+        console.log('Add Contact Response:', addContactResponse); // Verificar respuesta
+
         if (addContactResponse.attrs.type === 'result') {
             console.log('Contact added successfully');
+
+            // Verify the JID is the contact to whom we want to send the subscription request
+            if (jid) {
+                // Send presence stanza requesting subscription
+                const presenceStanza = xml('presence', {to: jid, type: 'subscribe'});
+                console.log("Presence stanza en addContact:", presenceStanza.toString());
+                await client.send(presenceStanza);
+                console.log('Subscription request sent to:', jid);
+            } else {
+                throw new Error('Invalid JID');
+            }
         } else {
             throw new Error('Failed to add contact');
         }
