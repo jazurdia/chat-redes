@@ -91,28 +91,37 @@ export const getMessages = async (client) => {
 
 export const listenForNewMessages = (client, callback) => {
     const handleStanza = (stanza) => {
-        if (stanza.is('message') && stanza.attrs.type === 'chat') {
+        if (stanza.is('message')) {
             const body = stanza.getChildText('body');
             let from = stanza.attrs.from;
             const to = stanza.attrs.to;
             const timestamp = new Date().toISOString(); // Use current timestamp for new messages
 
             // Normalize the 'from' attribute
-            // esto es solo para los individuales.
-            from = from.split('@alumchat.lol')[0] + '@alumchat.lol';
 
             if (body) {
-                callback({
-                    from,
-                    to,
-                    body,
-                    timestamp,
-                });
-            }
+                if (stanza.attrs.type === 'chat') {
 
+                    from = from.split('@alumchat.lol')[0] + '@alumchat.lol';
+                    callback({
+                        type: 'chat',
+                        from,
+                        to,
+                        body,
+                        timestamp,
+                    });
+                } else if (stanza.attrs.type === 'group message') {
+                    callback({
+                        type: 'groupmessage',
+                        from,
+                        to,
+                        body,
+                        timestamp,
+                    });
+                }
+            }
         }
     };
-
     client.on('stanza', handleStanza);
 
     // Return a function to remove the listener when needed
@@ -391,6 +400,19 @@ export const listenForNotifications = (client, callback) => {
                 });
             }
         }
+    };
+
+    client.on('stanza', handleStanza);
+
+    // Return a function to remove the listener when needed
+    return () => {
+        client.removeListener('stanza', handleStanza);
+    };
+};
+
+export const listenForAllStanzas = (client) => {
+    const handleStanza = (stanza) => {
+        console.log('Received stanza:', stanza.toString());
     };
 
     client.on('stanza', handleStanza);
