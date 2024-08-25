@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useState, useContext } from "react";
 import { removeContact } from '../auxiliaryFunctions/connectToXMPP';
 import AuthContext from '../auxiliaryFunctions/AuthContext';
+import userDeleteIcon from '/user-delete-svgrepo-com.svg';
 
 function AddedContactDisplay({ jid, status, show, onClick }) {
     const [varStatus, setVarStatus] = useState('indefinido');
@@ -17,20 +18,32 @@ function AddedContactDisplay({ jid, status, show, onClick }) {
         try {
             await removeContact(user.client, jid);
             console.log('Contact removed successfully');
-            // Optionally, you can add logic to update the contact list in the parent component
         } catch (error) {
             console.error('Failed to remove contact:', error);
         }
     };
 
     return (
-        <div className='p-2 flex justify-between items-center' onClick={onClick}>
-            <div className={`rounded-md py-2 px-4 break-words bg-blue-950 text-white w-full`}>
-                <p className='text-normal mb-2'>{jid}</p>
-                <p className='text-xs'>status: {varStatus}</p>
-                <p className='text-xs'>show: {varShow}</p>
+        <div 
+        className='m-1 p-3 flex justify-between items-center bg-blue-950 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-y-105 cursor-pointer'
+        onClick={onClick}
+        >
+            <div className='flex flex-row items-center w-full'>
+                <div className='text-white w-full'>
+                    <p className='text-lg font-semibold mb-2'>{jid}</p>
+                    <p className='text-sm italic'>Status: {varStatus ? varStatus : 'available'}</p>
+                    <p className='text-sm italic'>Show: {varShow ? varShow : 'Listo para chatear'}</p>
+                </div>
+                <button 
+                    onClick={handleRemoveContact} 
+                    className='ml-4 text-white rounded-full w-12 h-10 flex justify-center items-center transition duration-200 transform hover:scale-110'>
+                    <img
+                        src={userDeleteIcon}
+                        alt='remove-contact-icon'
+                        className='w-6 h-6'
+                    />
+                </button>
             </div>
-            <button onClick={handleRemoveContact} className='ml-2 text-red-500'>❌</button>
         </div>
     );
 }
