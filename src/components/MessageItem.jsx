@@ -8,6 +8,7 @@ function MessageItem({ body, from, timestamp }) {
     const isSent = from.includes(loggedUser);
 
     const isImage = body.endsWith('.png') || body.endsWith('.jpg') || body.endsWith('.jpeg') || body.endsWith('.gif');
+    const isPDF = body.endsWith('.pdf');
 
     return (
         <div className={`flex ${isSent ? 'justify-end' : 'justify-start'} mb-2`}>
@@ -17,6 +18,10 @@ function MessageItem({ body, from, timestamp }) {
                     <a href={body} download>
                         <img src={body} alt="file preview" className="w-full h-auto mb-0.5 cursor-pointer" />
                     </a>
+                ) : isPDF ? (
+                    <a href={body} download target="_blank" rel="noopener noreferrer">
+                        <embed src={body} type="application/pdf" className="w-full h-64 mb-0.5" />
+                    </a>
                 ) : (
                     <p className='text-md mb-0.5'>{body}</p>
                 )}
@@ -25,6 +30,7 @@ function MessageItem({ body, from, timestamp }) {
         </div>
     );
 }
+
 
 
 export default MessageItem;
