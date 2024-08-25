@@ -236,6 +236,7 @@ function Home() {
             return prevNotifications.filter((notification) => notification.from !== contactJid);
         });
     };
+    
 
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
