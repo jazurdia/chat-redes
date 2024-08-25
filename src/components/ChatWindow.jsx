@@ -46,9 +46,9 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             const formData = new FormData();
-            formData.append('files', file);  // 'files' es el campo esperado por el servidor
+            formData.append('files', file);
     
-            const directory = 'alejandro';  // Asegúrate de usar el nombre correcto del directorio
+            const directory = 'alejandro';
     
             try {
                 const response = await fetch(`https://redes-markalbrand56.koyeb.app/files/${directory}`, {
@@ -58,7 +58,23 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
     
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('Archivo enviado exitosamente:', result);
+                    const fileUrl = result.paths[0]; // URL del archivo
+    
+                    const timestamp = new Date().toISOString();
+                    const newMessage = {
+                        from: user.client.jid.local + '@' + user.client.jid.domain,
+                        to: toSelected,
+                        body: fileUrl,
+                        timestamp,
+                        isFile: true,
+                    };
+    
+                    // Añadir mensaje a la conversación
+                    addMessageToConversation(newMessage);
+    
+                    // Enviar URL del archivo como mensaje
+                    await sendMessage(user.client, toSelected, fileUrl);
+    
                 } else {
                     const errorText = await response.text();
                     console.error('Error al enviar el archivo:', errorText);
@@ -69,6 +85,7 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         };
         fileInput.click();
     };
+    
     
     
     
