@@ -10,34 +10,34 @@ function MessageItem({ body, from, timestamp }) {
     const isImage = body.endsWith('.png') || body.endsWith('.jpg') || body.endsWith('.jpeg') || body.endsWith('.gif');
     const isPDF = body.endsWith('.pdf');
 
+    // Convert the timestamp to a more user-friendly format
+    const formattedTimestamp = new Date(timestamp).toLocaleString();
+
     return (
         <div className={`flex ${isSent ? 'justify-end' : 'justify-start'} mb-2`}>
-            <div className={`rounded-md p-2 ${isSent ? 'bg-blue-500 text-white w-3/5' : 'bg-gray-300 text-black w-3/5'}`}>
-                <p className='text-xs mb-0.5'>{from}</p>
+            <div className={`rounded-lg p-3 ${isSent ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'} w-3/5`}>
+                <p className='text-xs font-semibold mb-2'>{from}</p>
                 {isImage ? (
                     <a href={body} download>
-                        <img src={body} alt="file preview" className="w-full h-auto mb-0.5 cursor-pointer" />
+                        <img src={body} alt="file preview" className="w-full h-auto rounded mb-2" />
                     </a>
                 ) : isPDF ? (
                     <a href={body} download target="_blank" rel="noopener noreferrer">
-                        <embed src={body} type="application/pdf" className="w-full h-64 mb-0.5" />
+                        <embed src={body} type="application/pdf" className="w-full h-64 rounded mb-2" />
                     </a>
                 ) : (
-                    <p className='text-md mb-0.5'>{body}</p>
+                    <p className='text-md mb-2'>{body}</p>
                 )}
-                <p className='text-xs text-right'>{timestamp}</p>
+                <p className='text-xs text-right opacity-75'>{formattedTimestamp}</p>
             </div>
         </div>
     );
 }
 
-
-
-export default MessageItem;
-
 MessageItem.propTypes = {
     body: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     timestamp: PropTypes.string.isRequired,
-    isFile: PropTypes.bool,
 };
+
+export default MessageItem;
