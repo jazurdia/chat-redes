@@ -137,28 +137,20 @@ function Home() {
     };
 
     const addMessageToConversation = (newMessage) => {
-        // Extraer el identificador base sin el recurso (/web) para usuarios individuales
         const normalizeJid = (jid) => jid.split('@alumchat.lol')[0] + '@alumchat.lol';
-
-        console.log("newMessage", newMessage);
+    
         const otherParticipant = normalizeJid(
             newMessage.from === (user.client.jid.local + "@alumchat.lol")
                 ? newMessage.to
                 : newMessage.from
         );
-
+    
         setConversations((prevConversations) => {
-            // Clone the existing conversations
-            const updatedConversations = {...prevConversations};
-
-            // Ensure the conversation array exists
+            const updatedConversations = { ...prevConversations };
             if (!updatedConversations[otherParticipant]) {
                 updatedConversations[otherParticipant] = [];
             }
-
-            // Add the new message to the appropriate conversation
-            updatedConversations[otherParticipant] = [...updatedConversations[otherParticipant], newMessage];
-
+            updatedConversations[otherParticipant].push(newMessage);
             return updatedConversations;
         });
     };
