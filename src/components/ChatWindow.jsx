@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import AuthContext from "../auxiliaryFunctions/AuthContext.jsx";
 import { sendMessage } from '../auxiliaryFunctions/connectToXMPP.js';
 import MessageItem from './MessageItem.jsx';
+import FilePlusIcon from '/file-plus-svgrepo-com.svg';
 
 function ChatWindow({ destinatary, addMessageToConversation, selectedMessages }) {
     const messagesEndRef = useRef(null);
@@ -39,6 +40,39 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         }
     };
 
+    const handleSendArchive = async () => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            const formData = new FormData();
+            formData.append('files', file);  // 'files' es el campo esperado por el servidor
+    
+            const directory = 'alejandro';  // Asegúrate de usar el nombre correcto del directorio
+    
+            try {
+                const response = await fetch(`https://redes-markalbrand56.koyeb.app/files/${directory}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+    
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Archivo enviado exitosamente:', result);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error al enviar el archivo:', errorText);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud de archivo:', error);
+            }
+        };
+        fileInput.click();
+    };
+    
+    
+    
+
     return (
         <div className='w-full h-full px-2 flex flex-col overflow-hidden p-2'>
             <div className='h-[95%] flex-col overflow-hidden overflow-y-scroll scrollbar-hide'>
@@ -70,6 +104,9 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
                     onClick={handleSendMessage}
                 >
                     Enviar
+                </button>
+                <button onClick={handleSendArchive}>
+                    <img src={FilePlusIcon} alt="file-plus-icon" className="w-8 h-8" />
                 </button>
             </div>
         </div>
