@@ -232,9 +232,9 @@ function Home() {
 
     return (
         <div className="w-screen h-screen m-0 p-0 flex flex-col overflow-hidden">
-            <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%]">
-                <div className='flex flex-row gap-12'>
-                    <p className='text-3xl px-2'>🔵 {user.client.jid.local}</p>
+            <div className="w-full text-white bg-slate-700 p-4 space flex justify-between h-[8%] shadow-md">
+                <div className='flex flex-row gap-12 items-center'>
+                    <p className='text-3xl px-2 font-bold tracking-wide'>🔵 {user.client.jid.local}</p>
                     <button onClick={handleNotificationsVisibility}>
                         <img
                             src="/notifications-active-svgrepo-com.svg"
@@ -243,25 +243,25 @@ function Home() {
                         />
                     </button>
                 </div>
-                <div className='flex flex-row gap-4'>
+                <div className='flex flex-row gap-4 items-center'>
                     <button onClick={handleChangePresence}
-                            className="bg-blue-700 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">
+                            className="bg-blue-700 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded shadow">
                         Cambiar Presencia
                     </button>
                     <button onClick={handleLogout}
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded shadow">
                         Cerrar sesión
                     </button>
                     <button onClick={handleDeleteAccount}
-                            className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+                            className="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow">
                         Eliminar Cuenta
                     </button>
                 </div>
             </div>
             <div className='flex flex-row h-full h-[92%] overflow-hidden'>
-                <div className='w-1/3 bg-slate-300 overflow-hidden overflow-y-scroll scrollbar-hide'>
-                    <div>
-                        <p className='p-2 text-xl'>Conversaciones</p>
+                <div className='w-1/3 bg-slate-300 overflow-hidden overflow-y-scroll scrollbar-hide p-4'>
+                    <div className='mb-4'>
+                        <p className='p-2 text-xl font-semibold tracking-wide text-slate-700'>Conversaciones</p>
                         {Object.keys(conversations).map((contactId) => (
                             <ContactDisplay
                                 key={contactId}
@@ -272,7 +272,7 @@ function Home() {
                         ))}
                     </div>
                     <div>
-                        <p className='p-2 text-xl'>Contactos</p>
+                        <p className='p-2 text-xl font-semibold tracking-wide text-slate-700'>Contactos</p>
                         <SearchForContact onAddContact={handleAddContact} placeholder={'Nuevo Contacto'}/>
                         {contacts.map((contact) => (
                             <AddedContactDisplay
@@ -285,7 +285,7 @@ function Home() {
                         ))}
                     </div>
                 </div>
-                <div className='w-2/3 bg-slate-400 overflow-hidden overflow-y-scroll scrollbar-hide'>
+                <div className='w-2/3 bg-slate-400 overflow-hidden overflow-y-scroll scrollbar-hide p-4'>
                     <ChatWindow
                         destinatary={destinatary}
                         addMessageToConversation={addMessageToConversation}
@@ -322,6 +322,7 @@ function Home() {
             )}
         </div>
     );
+    
 }
 
 export default Home;

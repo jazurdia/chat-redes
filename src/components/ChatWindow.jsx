@@ -16,7 +16,9 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
     }, [destinatary]);
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
     }, [selectedMessages]);
 
     const handleSendMessage = async () => {
@@ -85,10 +87,6 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         };
         fileInput.click();
     };
-    
-    
-    
-    
 
     return (
         <div className='w-full h-full px-2 flex flex-col overflow-hidden p-2'>
