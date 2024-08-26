@@ -29,6 +29,37 @@ The XMPP client is an instant messaging application developed in React that allo
 - [x] **Send/receive files**
 
 
+## Installation and Running
+
+**Prerequisites**
+- Node.js (version 14.x or higher)
+- npm (version 6.x or higher)
+
+**Installation**
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/yourusername/xmpp-client.git
+    cd xmpp-client
+    ```
+
+2. Install the dependencies:
+    ```sh
+    npm install
+    ```
+
+**Running the Application**
+1. Start the development server:
+    ```sh
+    npm run dev
+    ```
+
+2. Open your browser and navigate to:
+    ```
+    http://localhost:5137
+    ```
+
+**Additional Configuration**
+- Ensure you have the correct configuration for the XMPP server in the environment variables or configuration files as required by the `@xmpp/client` library.
 
 
 
