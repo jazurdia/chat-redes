@@ -28,7 +28,7 @@ function Notifications({ notifications, onAcceptContactRequest }) {
                         )}
                         {notification.type === 'contact_removed' && (
                             <div>
-                                <strong>Contacto eliminado:</strong> {notification.from}
+                                <p>Contacto: {notification.from} te ha eliminado de sus contactos</p>
                             </div>
                         )}
                     </li>
