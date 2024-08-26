@@ -9,10 +9,10 @@ The XMPP client is an instant messaging application developed in React that allo
 ---
 ## Screenshots
 
-![img_2.png](img_2.png)
-![img_4.png](img_4.png)
-![img_1.png](img_1.png)
-![img_5.png](img_5.png)
+![img_2.png](imgs/img_2.png)
+![img_4.png](imgs/img_4.png)
+![img_1.png](imgs/img_1.png)
+![img_5.png](imgs/img_5.png)
 ---
 ## Implemented Features
 - [x] **Register a new account on the server**
