@@ -299,37 +299,41 @@ export const listenForStatusChanges = (client, callback) => {
 }
 
 export const addContact = async (client, jid) => {
-
     console.log("Adding contact with JID:", jid);
+
+    if (!jid) {
+        throw new Error('Invalid JID');
+    }
 
     try {
         const addContactResponse = await client.iqCaller.request(
             xml(
                 'iq',
-                {type: 'set'},
+                {type: 'set', id: 'add_contact'},
                 xml(
                     'query',
                     {xmlns: 'jabber:iq:roster'},
-                    xml('item', {jid})
+                    xml('item', {jid, subscription: 'both'})
                 )
             )
         );
 
-        console.log('Add Contact Response:', addContactResponse); // Verificar respuesta
+        console.log('Add Contact Response:', addContactResponse);
 
         if (addContactResponse.attrs.type === 'result') {
             console.log('Contact added successfully');
 
-            // Verify the JID is the contact to whom we want to send the subscription request
-            if (jid) {
-                // Send presence stanza requesting subscription
-                const presenceStanza = xml('presence', {to: jid, type: 'subscribe'});
-                console.log("Presence stanza en addContact:", presenceStanza.toString());
-                await client.send(presenceStanza);
-                console.log('Subscription request sent to:', jid);
-            } else {
-                throw new Error('Invalid JID');
-            }
+            // Send presence stanza requesting subscription
+            const subscribePresence = xml('presence', {to: jid, type: 'subscribe'});
+            console.log("Presence stanza en addContact:", subscribePresence.toString());
+            await client.send(subscribePresence);
+            console.log('Subscription request sent to:', jid);
+
+            // Send presence stanza accepting the subscription
+            const subscribedPresence = xml('presence', {to: jid, type: 'subscribed'});
+            console.log("Subscribed presence stanza:", subscribedPresence.toString());
+            await client.send(subscribedPresence);
+            console.log('Subscription accepted for:', jid);
         } else {
             throw new Error('Failed to add contact');
         }
@@ -339,13 +343,17 @@ export const addContact = async (client, jid) => {
     }
 };
 
+
+
 export const changePresence = async (client, show, status) => {
     try {
         const presenceStanza = xml('presence', {},
             xml('show', {}, show),
             xml('status', {}, status)
         );
+        console.log("Sending presence stanza:", presenceStanza.toString());
         await client.send(presenceStanza);
+        console.log('Presence changed to:', show, status);
     } catch (error) {
         console.error('Failed to change presence:', error);
         throw error;
