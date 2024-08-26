@@ -3,6 +3,7 @@ import CustomTextInput from '../components/CustomTextInput';
 import { registerUser } from '../auxiliaryFunctions/connectToXMPP';
 import {useNavigate} from "react-router-dom";
 import AuthContext from "../auxiliaryFunctions/AuthContext.jsx";
+import logo from '/logo2-removebg.png';
 
 
 function SignUp() {
@@ -27,9 +28,13 @@ function SignUp() {
     }
 
     return (
-        <div className="flex justify-center mt-[20vh]">
+        <div className="flex justify-center">
             <div className="flex flex-col items-center">
-                <h1 className='text-4xl'>¡Únete a alumnchat!</h1>
+                <div className='flex flex-col items-center'>
+                    <img src={logo} alt="logo" className='w-80 h-80'/>
+                    <h1 className="text-6xl font-bold text-blue-400 mb-10">Ale Chat</h1>
+                </div>
+                <h1 className='text-4xl'>¡Únete y Chatea!</h1>
                 <p className='text-normal mt-2'>Regístrate para empezar a chatear</p>
                 <form className="w-full mt-4" onSubmit={handleSubmit}>
                     <CustomTextInput
@@ -55,7 +60,7 @@ function SignUp() {
                 </form>
             </div>
         </div>
-);
+    );
 }
 
 export default SignUp;

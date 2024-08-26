@@ -37,7 +37,6 @@ function Home() {
             try {
                 const fetchedMessages = await getMessages(user.client);
                 console.log("fetchedMessages", fetchedMessages);
-                console.log(fetchedMessages);
                 classifyMessages(fetchedMessages);
             } catch (error) {
                 console.error('Error fetching messages:', error);

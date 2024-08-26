@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CustomTextInput from '../components/CustomTextInput';
 import AuthContext from '../auxiliaryFunctions/AuthContext.jsx';
-import ChangePresence from "../components/ChangePresence.jsx";
+import logo from '/logo2-removebg.png';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -22,8 +22,12 @@ function Login() {
     };
 
     return (
-        <div className="flex justify-center mt-[20vh] ">
+        <div className="flex justify-around">
             <div className="flex flex-col items-center">
+                <div className='flex flex-col items-center'>
+                    <img src = {logo} alt="logo" className='w-80 h-80' />
+                    <h1 className="text-6xl font-bold text-blue-400 mb-10">Ale Chat</h1>
+                </div>
                 <h1 className='text-4xl'>Ingresa tus credenciales</h1>
                 <form onSubmit={handleSubmit} className="w-full mt-4">
                     <CustomTextInput
