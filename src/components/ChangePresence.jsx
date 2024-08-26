@@ -3,13 +3,15 @@ import {changePresence} from '../auxiliaryFunctions/connectToXMPP';
 import AuthContext from '../auxiliaryFunctions/AuthContext';
 
 const showOptions = ['chat', 'away', 'dnd', 'xa'];
-const statusOptions = ['Available', 'Busy', 'Away', 'Do not disturb'];
-
 function ChangePresence() {
     const {user} = useContext(AuthContext);
     const [status, setStatus] = useState('');
     const [show, setShow] = useState('');
 
+    /**
+     * Change presence
+     * @returns {Promise<void>}
+     */
     const handleChangePresence = async () => {
         try {
             await changePresence(user.client, show, status);

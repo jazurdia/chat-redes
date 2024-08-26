@@ -221,6 +221,10 @@ function Home() {
         }
     };
 
+    /**
+     * Deletes the user account.
+     * @returns {Promise<void>}
+     */
     const handleDeleteAccount = async () => {
         try {
             await deleteAccount(user.client);
@@ -230,6 +234,11 @@ function Home() {
         }
     };
 
+    /**
+     * Handles the addition of a contact.
+     * @param contactJid
+     * @returns {Promise<void>}
+     */
     const handleAddContact = async (contactJid) => {
         try {
             await addContact(user.client, contactJid);
@@ -240,14 +249,25 @@ function Home() {
         }
     }
 
+    /**
+     * Handles the change of presence.
+     */
     const handleChangePresence = () => {
         setIsChangePresenceVisible(!isChangePresenceVisible);
     };
 
+    /**
+     * Handles the visibility of notifications.
+     */
     const handleNotificationsVisibility = () => {
         setAreNotificationsVisible(!areNotificationsVisible);
     }
 
+    /**
+     * Handles the acceptance of a contact request.
+     * @param contactJid
+     * @returns {Promise<void>}
+     */
     const handleAcceptContactRequest = async (contactJid) => {
         console.log('lo que llega a handleAcceptContactRequest es :', contactJid);
 

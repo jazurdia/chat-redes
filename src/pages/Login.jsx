@@ -10,6 +10,11 @@ function Login() {
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
 
+    /**
+     * Handle login
+     * @param e
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 

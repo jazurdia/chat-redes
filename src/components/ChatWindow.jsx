@@ -21,6 +21,10 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         }
     }, [selectedMessages]);
 
+    /**
+     * Send message
+     * @returns {Promise<void>}
+     */
     const handleSendMessage = async () => {
         if (messageText.trim() === "") return;
         try {
@@ -42,6 +46,10 @@ function ChatWindow({ destinatary, addMessageToConversation, selectedMessages })
         }
     };
 
+    /**
+     * Send archive
+     * @returns {Promise<void>}
+     */
     const handleSendArchive = async () => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';

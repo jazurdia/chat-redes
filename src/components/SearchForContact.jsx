@@ -4,10 +4,18 @@ import PropTypes from "prop-types";
 function SearchForContact({onAddContact, placeholder}) {
     const [searchTerm, setSearchTerm] = useState('');
 
+    /**
+     * Handle search
+     * @param e
+     */
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
     };
 
+    /**
+     * Handle add contact
+     * @returns {Promise<void>}
+     */
     const handleAddContact = async () => {
         if (searchTerm.trim()){
             onAddContact(searchTerm.trim());

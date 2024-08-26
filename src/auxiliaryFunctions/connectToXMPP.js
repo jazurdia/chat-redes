@@ -1,5 +1,11 @@
 import {client as xmppClient, xml} from '@xmpp/client';
 
+/**
+ * Connect to the XMPP server
+ * @param jid
+ * @param password
+ * @returns {Promise<* & {tcp: *, sessionEstablishment: *, streamManagement: *, resolve: *, starttls: *, streamFeatures: *, iqCaller: *, sasl: *, resourceBinding: *, reconnect: *, websocket: *, tls: *, mechanisms: {}[], entity: *, middleware: *, iqCallee: *}>}
+ */
 export const connectToXMPP = async (jid, password) => {
     const client = xmppClient({
         service: 'ws://alumchat.lol:7070/ws/', // HTTP links should be avoided in production
@@ -29,6 +35,11 @@ export const connectToXMPP = async (jid, password) => {
     }
 };
 
+/**
+ * Get archived messages using MAM
+ * @param client
+ * @returns {Promise<unknown>}
+ */
 export const getMessages = async (client) => {
     return new Promise((resolve) => {
         const stanzas = [];
@@ -89,6 +100,13 @@ export const getMessages = async (client) => {
     });
 };
 
+
+/**
+ * Listen for new messages
+ * @param client
+ * @param callback
+ * @returns {(function(): void)|*}
+ */
 export const listenForNewMessages = (client, callback) => {
     const handleStanza = (stanza) => {
         if (stanza.is('message')) {
@@ -130,6 +148,13 @@ export const listenForNewMessages = (client, callback) => {
     };
 };
 
+/**
+ * Send a message
+ * @param client
+ * @param to
+ * @param body
+ * @returns {Promise<void>}
+ */
 export const sendMessage = async (client, to, body) => {
     const from = client.jid.toString();
     const messageStanza = xml(
@@ -147,6 +172,12 @@ export const sendMessage = async (client, to, body) => {
     }
 };
 
+/**
+ * Register a new user
+ * @param newUsername
+ * @param newPassword
+ * @returns {Promise<void>}
+ */
 export const registerUser = async (newUsername, newPassword) => {
     console.log("Registering new user...\nNew username: " + newUsername);
 
@@ -210,6 +241,11 @@ export const registerUser = async (newUsername, newPassword) => {
     }
 };
 
+/**
+ * Delete the user account
+ * @param client
+ * @returns {Promise<void>}
+ */
 export const deleteAccount = async (client) => {
     try {
         // Enviar el IQ request para eliminar la cuenta del usuario
@@ -238,6 +274,11 @@ export const deleteAccount = async (client) => {
     }
 };
 
+/**
+ * Get the user's contacts
+ * @param client
+ * @returns {Promise<*[]>}
+ */
 export const getContacts = async (client) => {
     try {
         const response = await client.iqCaller.request(
@@ -270,6 +311,12 @@ export const getContacts = async (client) => {
     }
 };
 
+/**
+ * Listen for status changes
+ * @param client
+ * @param callback
+ * @returns {(function(): void)|*}
+ */
 export const listenForStatusChanges = (client, callback) => {
     const handleStanza = (stanza) => {
         if (stanza.is('presence')) {
@@ -298,6 +345,12 @@ export const listenForStatusChanges = (client, callback) => {
     };
 }
 
+/**
+ * Listen for contact requests
+ * @param client
+ * @param jid
+ * @returns {Promise<void>}
+ */
 export const addContact = async (client, jid) => {
     console.log("Adding contact with JID:", jid);
 
@@ -344,7 +397,13 @@ export const addContact = async (client, jid) => {
 };
 
 
-
+/**
+ * Change presence status
+ * @param client
+ * @param show
+ * @param status
+ * @returns {Promise<void>}
+ */
 export const changePresence = async (client, show, status) => {
     try {
         const presenceStanza = xml('presence', {},
@@ -360,6 +419,12 @@ export const changePresence = async (client, show, status) => {
     }
 };
 
+/**
+ * Remove a contact
+ * @param client
+ * @param jid
+ * @returns {Promise<void>}
+ */
 export const removeContact = async (client, jid) => {
     try {
         // Send the IQ request to remove a contact
@@ -388,6 +453,12 @@ export const removeContact = async (client, jid) => {
     }
 };
 
+/**
+ * Listen for notifications
+ * @param client
+ * @param callback
+ * @returns {(function(): void)|*}
+ */
 export const listenForNotifications = (client, callback) => {
 
     const handleStanza = (stanza) => {
@@ -418,6 +489,11 @@ export const listenForNotifications = (client, callback) => {
     };
 };
 
+/**
+ * Listen for all stanzas
+ * @param client
+ * @returns {(function(): void)|*}
+ */
 export const listenForAllStanzas = (client) => {
     const handleStanza = (stanza) => {
         console.log('Received stanza:', stanza.toString());
@@ -431,6 +507,11 @@ export const listenForAllStanzas = (client) => {
     };
 };
 
+/**
+ * Logout the user
+ * @param client
+ * @returns {Promise<void>}
+ */
 export const logoutmng = async (client) => {
     try {
         // Send presence stanza to indicate the user is offline
@@ -446,6 +527,13 @@ export const logoutmng = async (client) => {
     }
 }
 
+/**
+ * Create or manage a group
+ * @param client
+ * @param roomJid
+ * @param roomName
+ * @returns {Promise<void>}
+ */
 export const manageGroup = async (client, roomJid, roomName = null) => {
     console.log("Managing group with Room JID:", roomJid);
 

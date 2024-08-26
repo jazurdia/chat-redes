@@ -14,6 +14,10 @@ function AddedContactDisplay({ jid, status, show, onClick }) {
         setVarShow(show);
     }, [status, show]);
 
+    /**
+     * Remove contact from roster
+     * @returns {Promise<void>}
+     */
     const handleRemoveContact = async () => {
         try {
             await removeContact(user.client, jid);

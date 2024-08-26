@@ -16,6 +16,11 @@ function SignUp() {
         clearUserContext();
     }, [clearUserContext]);
 
+    /**
+     * Handle register
+     * @param e
+     * @returns {Promise<void>}
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("En handleSubmit\n");

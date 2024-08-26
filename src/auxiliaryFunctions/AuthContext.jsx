@@ -22,6 +22,12 @@ export const AuthProvider = ({children}) => {
         }
     }, []);
 
+    /**
+     * Login function
+     * @param email
+     * @param password
+     * @returns {Promise<void>}
+     */
     const login = async (email, password) => {
         try {
             const client = await connectToXMPP(email, password);
@@ -34,6 +40,10 @@ export const AuthProvider = ({children}) => {
         }
     };
 
+    /**
+     * Logout function
+     * @returns {Promise<void>}
+     */
     const logout = async () => {
         if (user && user.client) {
             try {
@@ -48,6 +58,9 @@ export const AuthProvider = ({children}) => {
         window.location.href = '/';
     };
 
+    /**
+     * Clear user context
+     */
     const clearUserContext = () => {
         if (user && user.client) {
             user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
@@ -57,6 +70,10 @@ export const AuthProvider = ({children}) => {
         localStorage.removeItem('password');
     }
 
+    /**
+     * Check if user is authenticated
+     * @returns {boolean}
+     */
     const isAuthenticated = () => {
         return !!user;
     };
