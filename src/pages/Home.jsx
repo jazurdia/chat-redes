@@ -33,6 +33,11 @@ function Home() {
         let removeStatusListener;
         let removeNotificationListener;
 
+
+        /**
+         * Fetches messages from the server and classifies them into conversations.
+         * @returns {Promise<void>}
+         */
         const fetchMessages = async () => {
             try {
                 const fetchedMessages = await getMessages(user.client);
@@ -43,6 +48,10 @@ function Home() {
             }
         };
 
+        /**
+         * Fetches contacts from the server and sets them in the state.
+         * @returns {Promise<void>}
+         */
         const fetchContacts = async () => {
             try {
                 const contacts = await getContacts(user.client);
@@ -52,10 +61,18 @@ function Home() {
             }
         };
 
+        /**
+         * Handles a new message by adding it to the conversation.
+         * @param message
+         */
         const handleNewMessage = (message) => {
             addMessageToConversation(message);
         };
 
+        /**
+         * Handles a status change by updating the status of the contact.
+         * @param statusUpdate
+         */
         const handleStatusChange = (statusUpdate) => {
             setContacts((prevContacts) => {
                 return prevContacts.map(contact => {
@@ -67,10 +84,15 @@ function Home() {
             });
         };
 
+        /**
+         * Handles a notification by adding it to the notifications state.
+         * @param notification
+         */
         const handleNotification = (notification) => {
             setNotifications((prevNotifications) => [...prevNotifications, notification]);
         }
 
+        // Si el usuario está logueado, se inician los listeners
         if (user && user.client) {
             fetchMessages();
             fetchContacts();
@@ -87,6 +109,10 @@ function Home() {
         };
     }, [user]);
 
+    /**
+     * Classifies messages into conversations.
+     * @param messages
+     */
     const classifyMessages = (messages) => {
         if (!Array.isArray(messages)) {
             console.error('Expected messages to be an array, but got:', messages);
@@ -135,6 +161,10 @@ function Home() {
         setConversations(updatedConversations);
     };
 
+    /**
+     * Adds a message to the conversation.
+     * @param newMessage
+     */
     const addMessageToConversation = (newMessage) => {
         const normalizeJid = (jid) => jid.split('@alumchat.lol')[0] + '@alumchat.lol';
     
@@ -154,10 +184,17 @@ function Home() {
         });
     };
 
+    /**
+     * Logs out the user.
+     */
     const handleLogout = () => {
         logout();
     };
 
+    /**
+     * Handles the selection of a conversation.
+     * @param contactId
+     */
     const handleSelectConversation = (contactId) => {
         const loggedUser = user.client.jid.local + "@alumchat.lol";
         let contactJid = contactId.includes(loggedUser) ? contactId : `${contactId}@alumchat.lol`;

@@ -431,5 +431,82 @@ export const listenForAllStanzas = (client) => {
     };
 };
 
+export const logoutmng = async (client) => {
+    try {
+        // Send presence stanza to indicate the user is offline
+        const presenceStanza = xml('presence', {type: 'unavailable'});
+        await client.send(presenceStanza);
+
+        // Stop the client
+        await client.stop();
+        console.log('Logged out successfully');
+    } catch (error) {
+        console.error('Failed to logout:', error);
+        throw error;
+    }
+}
+
+export const manageGroup = async (client, roomJid, roomName = null) => {
+    console.log("Managing group with Room JID:", roomJid);
+
+    if (!roomJid) {
+        throw new Error('Invalid Room JID');
+    }
+
+    try {
+        if (roomName) {
+            // Create a new room if roomName is provided
+            const createRoomResponse = await client.iqCaller.request(
+                xml(
+                    'iq',
+                    {type: 'set', to: roomJid, id: 'create_room'},
+                    xml(
+                        'query',
+                        {xmlns: 'http://jabber.org/protocol/muc#owner'},
+                        xml('x', {xmlns: 'jabber:x:data', type: 'submit'},
+                            xml('field', {var: 'FORM_TYPE', type: 'hidden'},
+                                xml('value', {}, 'http://jabber.org/protocol/muc#roomconfig')
+                            ),
+                            xml('field', {var: 'muc#roomconfig_roomname'},
+                                xml('value', {}, roomName)
+                            ),
+                            xml('field', {var: 'muc#roomconfig_persistentroom'},
+                                xml('value', {}, '1') // Configura la sala como persistente
+                            ),
+                            xml('field', {var: 'muc#roomconfig_publicroom'},
+                                xml('value', {}, '1') // Configura la sala como pública
+                            )
+                        )
+                    )
+                )
+            );
+
+            console.log('Create Room Response:', createRoomResponse);
+
+            if (createRoomResponse.attrs.type !== 'result') {
+                throw new Error('Failed to create group');
+            }
+
+            console.log('Group created successfully:', roomName);
+        }
+
+        // Join or subscribe to the room
+        const presenceStanza = xml(
+            'presence',
+            {to: `${roomJid}/${client.jid.local}`},
+            xml('x', {xmlns: 'http://jabber.org/protocol/muc'})
+        );
+        console.log("Presence stanza for joining group:", presenceStanza.toString());
+        await client.send(presenceStanza);
+        console.log('Joined or subscribed to group:', roomJid);
+
+        // Here you would start listening to messages in the group
+        // Logic to listen to messages will be implemented later
+
+    } catch (error) {
+        console.error('Failed to manage group:', error);
+        throw error;
+    }
+};
 
 

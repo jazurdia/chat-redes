@@ -1,5 +1,5 @@
 import {createContext, useState, useEffect} from 'react';
-import {connectToXMPP} from './connectToXMPP';
+import {connectToXMPP, logoutmng} from './connectToXMPP';
 
 const AuthContext = createContext(undefined);
 
@@ -34,9 +34,13 @@ export const AuthProvider = ({children}) => {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
         if (user && user.client) {
-            user.client.stop().catch((error) => console.error('Error stopping XMPP client:', error));
+            try {
+                await logoutmng(user.client);
+            } catch (error) {
+                console.error('Error stopping XMPP client:', error);
+            }
         }
         setUser(null);
         localStorage.removeItem('email');
