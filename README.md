@@ -62,6 +62,17 @@ The XMPP client is an instant messaging application developed in React that allo
 - Ensure you have the correct configuration for the XMPP server in the environment variables or configuration files as required by the `@xmpp/client` library.
 
 
+## Challenges
+The greatest challenge of this project was, undoubtedly, the use of the XMPP protocol. I had never used this protocol before and had no frame of reference. The documentation on XMPP as such was not very helpful to me, as each server seems to be configured and built however the author wished.
 
+In this case, I spent a lot of time understanding how the stanzas of the server itself worked. Designing the chat did not take much time, but the logic to get what I needed, such as contacts, conversations, listening to messages, and obtaining notifications, was practically trial and error. Apparently, there were different ways to do the same thing, and each XMPP connection library had its own ways of doing things.
 
+In my case, a major issue and the reason why I could not deploy the project on Netlify and add it to my portfolio is that there were HTTPS certificates which the server did not have.
 
+## Lessons Learned
+The main lessons learned during the development of this project are the following:
+
+- Use of the XMPP protocol.
+- What are stanzas?
+- How to use stanzas.
+- How to integrate XMPP with React.
